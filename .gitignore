@@ -52,3 +52,6 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 typings/
 yarn-debug.log*
 yarn-error.log*
+
+# auto summon
+src/lib/defs/iconfont.ts

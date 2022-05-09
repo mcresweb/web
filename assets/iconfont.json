@@ -1,0 +1,30 @@
+{
+  "id": "3388568",
+  "name": "mcresweb",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "400020",
+      "name": "主页",
+      "font_class": "htmal5icon06",
+      "unicode": "e622",
+      "unicode_decimal": 58914
+    },
+    {
+      "icon_id": "677608",
+      "name": "用户",
+      "font_class": "yonghu",
+      "unicode": "e639",
+      "unicode_decimal": 58937
+    },
+    {
+      "icon_id": "26048165",
+      "name": "资源",
+      "font_class": "ziyuan",
+      "unicode": "e62b",
+      "unicode_decimal": 58923
+    }
+  ]
+}

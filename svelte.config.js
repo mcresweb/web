@@ -15,15 +15,15 @@ const config = {
 		methodOverride: {
 			allowed: ['PATCH', 'DELETE'],
 		},
-	},
-	vite: {
-		resolve: {
-			alias: {
-				$components: path.resolve('./src/lib/components'),
-				$database: path.resolve('./src/lib/database'),
-				$defs: path.resolve('./src/lib/defs'),
-				$helpers: path.resolve('./src/lib/helpers'),
-				$lib: path.resolve('./src/lib'),
+		vite: {
+			resolve: {
+				alias: {
+					$components: path.resolve('./src/lib/components'),
+					$database: path.resolve('./src/lib/database'),
+					$defs: path.resolve('./src/lib/defs'),
+					$helpers: path.resolve('./src/lib/helpers'),
+					$lib: path.resolve('./src/lib'),
+				},
 			},
 		},
 	},
