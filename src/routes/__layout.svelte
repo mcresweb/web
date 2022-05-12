@@ -1,7 +1,21 @@
 <script lang="ts">
-	import 'bootstrap/dist/css/bootstrap.min.css';
+	import Icon from '$components/Icon.svelte';
+	import '@picocss/pico/css/pico.min.css';
 	import '../app.css';
 </script>
+
+<header>
+	<nav>
+		<ul>
+			<li><Icon icon="yonghu" /><strong>Brand</strong></li>
+		</ul>
+		<ul>
+			<li><a href="#a">Link</a></li>
+			<li><a href="#b">Link</a></li>
+			<li><a href="#c" role="button">Button</a></li>
+		</ul>
+	</nav>
+</header>
 
 <main>
 	<slot />
