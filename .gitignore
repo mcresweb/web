@@ -55,3 +55,6 @@ yarn-error.log*
 
 # auto summon
 src/lib/defs/iconfont.ts
+
+#config
+config.yml

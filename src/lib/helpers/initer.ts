@@ -6,7 +6,7 @@ let startResolve: (v: void) => void;
 /**
  * 所有初始化模块
  */
-const waitList = ['db'] as const;
+const waitList = ['conf'] as const;
 /** 所有初始化模块的类型 */
 type waitTypes = typeof waitList[number];
 
