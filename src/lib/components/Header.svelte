@@ -13,7 +13,7 @@
 		<ul>
 			{#await listCatalogue(fetch) then list}
 				{#each list as catalogue}
-					<li><a href="#{catalogue.key}">{catalogue.title}</a></li>
+					<li><a href="/content/{catalogue.key}">{catalogue.title}</a></li>
 				{/each}
 			{/await}
 		</ul>
@@ -25,6 +25,7 @@
 
 <style>
 	header {
+		height: 62px;
 		box-shadow: 0 0 5px #999;
 		padding: 0 10px;
 	}
