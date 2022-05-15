@@ -1,6 +1,8 @@
+import type { ApiResp } from '$defs/ApiResp';
+import type { Catalogue } from '$defs/content';
 import type { RequestHandler } from '@sveltejs/kit';
 
-export const get: RequestHandler = async () => {
+export const get: RequestHandler = async (): ApiResp<Catalogue[]> => {
 	return {
 		body: [
 			{ index: 1, title: '地图', key: 'maps', img: '681e020597ffc4710c33838df3d6b1f5' },

@@ -1,7 +1,4 @@
 <script lang="ts">
-	import { browser } from '$app/env';
-
-	import Header from '$components/Header.svelte';
 	import type { BasicInfo } from '$defs/info';
 	import { basic } from '$lib/api/info';
 	import anime from 'animejs';
@@ -48,7 +45,7 @@
 				</h2>
 			</div>
 			{#await basic(fetch)}
-				<article aria-busy="true" class=" col-lg-4 " />
+				<article aria-busy="true" class="col-lg-4" />
 			{:then data}
 				<article class="col-lg-4" in:fly={flyData}>
 					<table>
@@ -89,7 +86,7 @@
 										{#each category as cate}
 											<tr in:fly={flyData}>
 												<td>
-													<a href="/content/{cata.key}#{cate.key}">{cate.title}</a>
+													<a href="/content/{cata.key}?p=1#{cate.key}">{cate.title}</a>
 												</td>
 											</tr>
 										{/each}
@@ -109,6 +106,8 @@
 		font-size: 1.2em;
 		font-weight: bolder;
 		color: var(--bs-orange);
+		padding: 5px;
+		border-bottom: 1px solid var(--primary);
 	}
 	.m {
 		color: var(--bs-teal);

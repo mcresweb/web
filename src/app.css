@@ -2,36 +2,37 @@ a {
 	text-decoration: none;
 	color: #000;
 }
-/* 亮粉色方案(默认) */
+
+/* 亮色方案(默认) */
 [data-theme='light'],
 :root:not([data-theme='dark']) {
-	--primary: #d81b60;
-	--primary-hover: #c2185b;
-	--primary-focus: rgba(216, 27, 96, 0.125);
+	--primary: #fb8c00;
+	--primary-hover: #f57c00;
+	--primary-focus: rgba(251, 140, 0, 0.125);
 	--primary-inverse: #fff;
 }
 
-/* 暗粉色方案(自动) */
+/* 暗色方案(自动) */
 /* 如果用户已启用暗模式, 则自动启用 */
 @media only screen and (prefers-color-scheme: dark) {
 	:root:not([data-theme='light']) {
-		--primary: #d81b60;
-		--primary-hover: #e91e63;
-		--primary-focus: rgba(216, 27, 96, 0.25);
+		--primary: #fb8c00;
+		--primary-hover: #ff9800;
+		--primary-focus: rgba(251, 140, 0, 0.25);
 		--primary-inverse: #fff;
 	}
 }
 
-/* 暗粉色方案 (强制) */
+/* 暗色方案 (强制) */
 /* 如果强制使用data-theme="dark"则启用 */
 [data-theme='dark'] {
-	--primary: #d81b60;
-	--primary-hover: #e91e63;
-	--primary-focus: rgba(216, 27, 96, 0.25);
+	--primary: #fb8c00;
+	--primary-hover: #ff9800;
+	--primary-focus: rgba(251, 140, 0, 0.25);
 	--primary-inverse: #fff;
 }
 
-/* 粉色(通用格式) */
+/* 通用格式 */
 :root {
 	--form-element-active-border-color: var(--primary);
 	--form-element-focus-color: var(--primary-focus);

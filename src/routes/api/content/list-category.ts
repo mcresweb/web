@@ -1,6 +1,8 @@
+import type { ApiResp } from '$defs/ApiResp';
+import type { Category } from '$defs/content';
 import type { RequestHandler } from '@sveltejs/kit';
 
-export const get: RequestHandler = async (event) => {
+export const get: RequestHandler = async (event): ApiResp<Category[] | null> => {
 	const cata = event.url.searchParams.get('catalogue');
 
 	if (cata === 'maps')
