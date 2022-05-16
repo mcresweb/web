@@ -46,7 +46,9 @@
 							<Thumbnail {src} bind:show={imgShow[ess.id]} />
 							<div class="title">{ess.title}</div>
 							<div class="info">
-								<span><Star star={ess.star} small /></span>
+								{#if ess.star}
+									<span><Star star={ess.star} small /></span>
+								{/if}
 								<span>
 									<Icon icon="xiazai" />
 									{ess.download}

@@ -39,3 +39,7 @@ a {
 	--switch-color: var(--primary-inverse);
 	--switch-checked-background-color: var(--primary);
 }
+
+nav {
+	white-space: nowrap;
+}

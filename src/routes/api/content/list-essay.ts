@@ -9,7 +9,7 @@ export const get: RequestHandler = async (): ApiResp<EssayList> => {
 			id,
 			sender: 'yuanlu' + id,
 			title: '随机' + Math.random().toString().substring(2),
-			star: ((Math.random() * 50) | 0) / 10,
+			star: Math.random() > 0.5 ? ((Math.random() * 50) | 0) / 10 : undefined,
 			download: (Math.random() * 100000) | 0,
 			img: v4().replace(/-/g, ''),
 		};

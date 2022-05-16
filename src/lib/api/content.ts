@@ -68,6 +68,18 @@ export const getEssay = async (f: FetchFunction, id: number): Promise<Essay | nu
 	if (!resp.ok) return null;
 	return await resp.json();
 };
+/**
+ * 获取内容url
+ * @param catalogue 大分类
+ * @param category 小分类
+ * @param page 页码
+ * @returns url
+ */
+export const contentUrl = (catalogue: string, category?: string, page?: number) => {
+	let url = `/content/${catalogue}?p=${page || 1}`;
+	if (category) url += '#' + category;
+	return url;
+};
 
 /** index排序 */
 const sortIndex = sortK('index');

@@ -39,7 +39,7 @@ export type EssayList = {
 		/** 内容标题 */
 		title: string;
 		/** 评分 */
-		star: number;
+		star?: number;
 		/** 下载数 */
 		download: number;
 		/** 内容图片 */
@@ -62,7 +62,9 @@ export type Essay = {
 	/** 内容标题 */
 	title: string;
 	/** 评分 */
-	star: number;
+	star?: number;
+	/** 评分人数 */
+	starAmount?: number;
 	/** 下载数 */
 	download: number;
 	/** 介绍图片 */
@@ -71,6 +73,10 @@ export type Essay = {
 	content: string;
 	/** 内容文章的类型 */
 	type: ContentType;
+	/** 内容标签 */
+	tags?: string[];
+	/** 简略描述 */
+	description?: string;
 };
 
 /** 允许的文章类型 */

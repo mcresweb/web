@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { session } from '$app/stores';
-	import { listCatalogue } from '$lib/api/content';
+	import { contentUrl, listCatalogue } from '$lib/api/content';
 
 	import Icon from './Icon.svelte';
 </script>
@@ -13,7 +13,7 @@
 		<ul>
 			{#await listCatalogue(fetch) then list}
 				{#each list as catalogue}
-					<li><a href="/content/{catalogue.key}">{catalogue.title}</a></li>
+					<li><a href={contentUrl(catalogue.key)}>{catalogue.title}</a></li>
 				{/each}
 			{/await}
 		</ul>

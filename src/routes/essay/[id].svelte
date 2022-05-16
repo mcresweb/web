@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-	import { getEssay } from '$lib/api/content';
+	import { contentUrl, getEssay } from '$lib/api/content';
 	import type { Load } from '@sveltejs/kit';
 
 	export const load: Load = async ({ fetch, params }) => {
@@ -25,7 +25,7 @@
 	export let essay: Essay;
 </script>
 
-<div class="container">
+<div class="container-xl">
 	<article id="head">
 		<nav>
 			<ul>
@@ -33,7 +33,10 @@
 					<div class="headings">
 						<h1 class="hidden-sm">{essay.title}</h1>
 						<h3 class="visible-sm">{essay.title}</h3>
-						<h2>{essay.catalogue} &gt; {essay.category}</h2>
+						<h2>
+							<a href={contentUrl(essay.catalogue)}>{essay.catalogue}</a> &gt;
+							<a href={contentUrl(essay.catalogue, essay.category)}>{essay.category}</a>
+						</h2>
 					</div>
 				</li>
 			</ul>
@@ -42,12 +45,19 @@
 		<nav>
 			<ul>
 				<li>评价:</li>
-				<li class="visible-sm">
-					<Star star={essay.star} small />
-				</li>
-				<li class="hidden-sm">
-					<Star star={essay.star} />
-				</li>
+				{#if essay.star !== undefined}
+					<li class="visible-sm">
+						<Star star={essay.star} small />
+					</li>
+					<li class="hidden-sm">
+						<Star star={essay.star} />
+					</li>
+				{:else}
+					<li>暂无</li>
+				{/if}
+				{#if essay.starAmount !== undefined}
+					<li>({essay.starAmount} 次评价)</li>
+				{/if}
 			</ul>
 			<ul>
 				<li>下载量:</li>
@@ -58,6 +68,19 @@
 				<li>123</li>
 			</ul>
 		</nav>
+		{#if essay.tags}
+			<hr />
+			<span id="tags">
+				标签:
+				{#each essay.tags as tag, i}
+					{#if i},{/if}&nbsp;<a href="/tag/{tag}">{tag}</a>&nbsp;
+				{/each}
+			</span>
+		{/if}
+		{#if essay.description}
+			<hr />
+			<p>{essay.description}</p>
+		{/if}
 		<hr />
 		<Swiper
 			modules={[Pagination, Autoplay, Mousewheel]}
@@ -93,8 +116,21 @@
 </div>
 
 <style>
+	#tags {
+		font-size: 0.8em;
+		text-align: right;
+		width: 100%;
+		display: inline-block;
+	}
+	#tags a {
+		margin: 2px;
+	}
 	#head button {
 		white-space: nowrap;
+	}
+	#head h2,
+	#head h2 * {
+		color: var(--bs-gray) !important;
 	}
 	article {
 		position: relative;

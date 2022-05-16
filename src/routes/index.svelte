@@ -5,7 +5,7 @@
 	import { fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import { delay } from '$helpers/delay';
-	import { listCatalogue, listCategory } from '$lib/api/content';
+	import { contentUrl, listCatalogue, listCategory } from '$lib/api/content';
 
 	const names: Record<keyof BasicInfo, string> = {
 		catalogue: '分类数量',
@@ -71,7 +71,7 @@
 					<div class="col-md-6 resources" in:fly={flyData}>
 						<table>
 							<thead>
-								<tr><th><a href="/content/{cata.key}">{cata.title}</a></th></tr>
+								<tr><th><a href={contentUrl(cata.key)}>{cata.title}</a></th></tr>
 							</thead>
 							<tbody>
 								{#await listCategory(fetch, cata.key)}
@@ -81,7 +81,7 @@
 										{#each category as cate}
 											<tr in:fly={flyData}>
 												<td>
-													<a href="/content/{cata.key}?p=1#{cate.key}">{cate.title}</a>
+													<a href={contentUrl(cata.key, cate.key)}>{cate.title}</a>
 												</td>
 											</tr>
 										{/each}
