@@ -40,10 +40,7 @@
 			<div class="row" in:fly={flyData}>
 				{#each essay.list as ess (ess.id)}
 					{@const src = imgUrl(ess.img)}
-					<div
-						class="essay col-6 col-sm-6 col-md-4 col-lg-4 col-xxl-2"
-						on:click={() => goto('/essay/' + ess.id)}
-					>
+					<div class="essay col-md-6 col-lg-4 col-xxl-3" on:click={() => goto('/essay/' + ess.id)}>
 						<img class="bg" src={imgShow[ess.id] ? src : undefined} alt="" />
 						<article>
 							<Thumbnail {src} bind:show={imgShow[ess.id]} />
@@ -72,11 +69,17 @@
 		padding: 10px 8vw;
 	}
 	.essay {
+		--essay-big: 1vw;
 		cursor: pointer;
-		padding: 10px;
+		padding: var(--essay-big);
 		margin: 0;
 		border-radius: 5px;
 		position: relative;
+		transition: padding 0.3s;
+		line-height: 2em;
+	}
+	.essay:hover {
+		--essay-big: 0.6vw;
 	}
 	.essay:hover .bg {
 		transition: opacity 0.2s;

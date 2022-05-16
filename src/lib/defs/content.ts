@@ -74,6 +74,6 @@ export type Essay = {
 };
 
 /** 允许的文章类型 */
-export const contentType = ['markdown', 'html', 'bbcode'] as const;
+export const contentType = ['markdown', 'html', 'bbcode', 'text'] as const;
 /** 允许的文章类型 */
 export type ContentType = typeof contentType[number];

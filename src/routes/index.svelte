@@ -17,13 +17,8 @@
 	const keys = <T extends string>(obj: Record<T, any>) => Object.keys(obj) as T[];
 	const animeData = (ele: HTMLElement) => {
 		const data = parseFloat(ele.dataset.value || '0') || 0;
-		anime({
-			targets: ele,
-			innerHTML: [0, data],
-			easing: 'linear',
-			round: 1,
-			duration: Math.random() * 1500,
-		});
+		const duration = Math.random() * 1500;
+		anime({ targets: ele, innerHTML: [0, data], easing: 'linear', round: 1, duration });
 	};
 	$: if (eles) eles.forEach(animeData);
 
