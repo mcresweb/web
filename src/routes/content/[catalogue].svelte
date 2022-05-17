@@ -7,7 +7,7 @@
 </script>
 
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page, session } from '$app/stores';
 	import type { Catalogue, Category } from '$defs/content';
 	import { contentUrl, listCatalogue, listCategory } from '$lib/api/content';
 	import type { Load } from '@sveltejs/kit';
@@ -62,6 +62,7 @@
 </script>
 
 <svelte:window on:hashchange={() => (cateKey = (location.hash || '').substring(1))} />
+<svelte:head><title>内容列表 - {$session.title}</title></svelte:head>
 
 {#await cata ? delay() : null then _}
 	{#if cata && cate && allCate}

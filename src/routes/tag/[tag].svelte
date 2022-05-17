@@ -1,5 +1,11 @@
-<script lang="ts">
+<script context="module" lang="ts">
 </script>
+
+<script lang="ts">
+	import { page, session } from '$app/stores';
+</script>
+
+<svelte:head><title>{$page.params.tag} - {$session.title}</title></svelte:head>
 
 <div class="container">
 	<article>

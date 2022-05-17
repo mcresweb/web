@@ -28,6 +28,7 @@
 <script lang="ts">
 	import type { MeLoginInfo } from '$defs/user';
 	import { browser } from '$app/env';
+	import { session } from '$app/stores';
 
 	export let user: MeLoginInfo;
 
@@ -36,6 +37,7 @@
 </script>
 
 <svelte:window on:hashchange={() => (menu = getMenu())} />
+<svelte:head><title>用户 - {$session.title}</title></svelte:head>
 
 {#if browser && !user}
 	<h3>内部出错</h3>

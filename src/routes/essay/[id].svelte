@@ -23,9 +23,12 @@
 	import { marked } from 'marked';
 	import { getInfo } from '$lib/api/user';
 	import { browser } from '$app/env';
+	import { session } from '$app/stores';
 
 	export let essay: Essay;
 </script>
+
+<svelte:head><title>{essay.title} - {$session.title}</title></svelte:head>
 
 <div class="container-xl">
 	<article id="head">

@@ -6,6 +6,7 @@
 	import { quintOut } from 'svelte/easing';
 	import { delay } from '$helpers/delay';
 	import { contentUrl, listCatalogue, listCategory } from '$lib/api/content';
+	import { session } from '$app/stores';
 
 	const names: Record<keyof BasicInfo, string> = {
 		catalogue: '分类数量',
@@ -24,6 +25,8 @@
 
 	const flyData = { y: 20, duration: 800, easing: quintOut };
 </script>
+
+<svelte:head><title>{$session.title}</title></svelte:head>
 
 {#await delay() then _}
 	<div id="head" class="container" in:fly={{ ...flyData, y: 100 }}>
