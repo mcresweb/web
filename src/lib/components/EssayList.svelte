@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Catalogue, Category } from '$defs/content';
-	import { listEssay } from '$lib/api/content';
+	import { essayUrl, listEssay } from '$lib/api/content';
 	import { imgUrl } from '$lib/api/img';
 	import Thumbnail from './Thumbnail.svelte';
 	import { fly, type FlyParams } from 'svelte/transition';
@@ -40,7 +40,7 @@
 			<div class="row" in:fly={flyData}>
 				{#each essay.list as ess (ess.id)}
 					{@const src = imgUrl(ess.img)}
-					<div class="essay col-md-6 col-lg-4 col-xxl-3" on:click={() => goto('/essay/' + ess.id)}>
+					<div class="essay col-md-6 col-lg-4 col-xxl-3" on:click={() => goto(essayUrl(ess.id))}>
 						<img class="bg" src={imgShow[ess.id] ? src : undefined} alt="" />
 						<article>
 							<Thumbnail {src} bind:show={imgShow[ess.id]} />

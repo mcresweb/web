@@ -9,7 +9,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import type { Catalogue, Category } from '$defs/content';
-	import { listCatalogue, listCategory } from '$lib/api/content';
+	import { contentUrl, listCatalogue, listCategory } from '$lib/api/content';
 	import type { Load } from '@sveltejs/kit';
 	import { fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
@@ -72,7 +72,7 @@
 			{:else}
 				<div id="category" class="grid">
 					{#each Object.keys(allCate) as key}
-						<a href="?p=1#{key}">
+						<a href={contentUrl(cata.key, key)}>
 							<div class="category" class:active={cate.key == key}>
 								{allCate[key].title}
 							</div>

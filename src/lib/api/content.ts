@@ -69,7 +69,7 @@ export const getEssay = async (f: FetchFunction, id: number): Promise<Essay | nu
 	return await resp.json();
 };
 /**
- * 获取内容url
+ * 获取内容分类url
  * @param catalogue 大分类
  * @param category 小分类
  * @param page 页码
@@ -80,6 +80,12 @@ export const contentUrl = (catalogue: string, category?: string, page?: number) 
 	if (category) url += '#' + category;
 	return url;
 };
+/**
+ * 获取内容url
+ * @param essay 内容ID
+ * @returns url
+ */
+export const essayUrl = (essay: number) => `/essay/${essay}`;
 
 /** index排序 */
 const sortIndex = sortK('index');

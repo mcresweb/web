@@ -14,13 +14,15 @@
 <script lang="ts">
 	import Star from '$components/Star.svelte';
 	import type { Essay } from '$defs/content';
-	import { Autoplay, Pagination, Lazy, Mousewheel } from 'swiper';
+	import { Autoplay, Pagination, Mousewheel } from 'swiper';
 	import { Swiper, SwiperSlide } from 'swiper/svelte';
 	import 'swiper/css';
 	import 'swiper/css/pagination';
 	import 'swiper/css/autoplay';
 	import { imgUrl } from '$lib/api/img';
 	import { marked } from 'marked';
+	import { getInfo } from '$lib/api/user';
+	import { browser } from '$app/env';
 
 	export let essay: Essay;
 </script>
@@ -65,7 +67,11 @@
 			</ul>
 			<ul>
 				<li>发布者:</li>
-				<li>123</li>
+				{#await browser && essay.sender && getInfo(fetch, essay.sender)}
+					<li>{(essay.sender || '').substring(0, 8)}</li>
+				{:then user}
+					<li>{(user && user.name) || (essay.sender || '').substring(0, 8)}</li>
+				{/await}
 			</ul>
 		</nav>
 		{#if essay.tags}
