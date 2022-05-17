@@ -33,3 +33,11 @@ export const getInfo = async (f: FetchFunction, uuid: string): Promise<UserInfo 
  * @returns url
  */
 export const loginUrl = () => '/user/login';
+
+/**
+ * 执行登出
+ * @param f fetch
+ */
+export const doLogout = (f: FetchFunction) => {
+	return f('/api/user/logout');
+};
