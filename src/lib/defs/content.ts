@@ -83,3 +83,29 @@ export type Essay = {
 export const contentType = ['markdown', 'html', 'bbcode', 'text'] as const;
 /** 允许的文章类型 */
 export type ContentType = typeof contentType[number];
+
+/**
+ * 文件列表
+ */
+export type FileList = {
+	/** 成功获取 */
+	success: true;
+	/** 文件数量 */
+	amount: number;
+	/** 文件信息 */
+	files: FileInfo[];
+};
+
+/**
+ * 文件信息
+ */
+export type FileInfo = {
+	/** 文件uuid */
+	id: string;
+	/** 文件名称 */
+	name: string;
+	/** 文件大小(字节数) */
+	size: number;
+	/** sha1验证 */
+	sha1: string;
+};

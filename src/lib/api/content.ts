@@ -1,4 +1,4 @@
-import type { Catalogue, Category, Essay, EssayList } from '$defs/content';
+import type { Catalogue, Category, Essay, EssayList, FileList } from '$defs/content';
 import type { FetchFunction } from '$defs/FetchFunction.type';
 import { cacheOrGet } from '$helpers/browserCache';
 
@@ -68,6 +68,21 @@ export const getEssay = async (f: FetchFunction, id: number): Promise<Essay | nu
 	if (!resp.ok) return null;
 	return await resp.json();
 };
+/**
+ * 列出内容的文件列表
+ * @param f fetch
+ * @param essay 内容ID
+ * @returns 文件列表 / 错误消息
+ */
+export const listFile = async (f: FetchFunction, essay: number): Promise<FileList | string> => {
+	if (isNaN(essay)) return '无效essay ID';
+	const resp = await f(`/api/content/list-file?essay=${essay}`);
+	if (!resp.ok) return resp.statusText;
+	const info: FileList | { success: false; err: string } = await resp.json();
+	if (!info.success) return info.err;
+	return info;
+};
+
 /**
  * 获取内容分类url
  * @param catalogue 大分类

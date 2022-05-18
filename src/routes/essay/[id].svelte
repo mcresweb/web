@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-	import { contentUrl, getEssay } from '$lib/api/content';
+	import { contentUrl, getEssay, listFile } from '$lib/api/content';
 	import type { Load } from '@sveltejs/kit';
 
 	export const load: Load = async ({ fetch, params }) => {
@@ -13,7 +13,7 @@
 
 <script lang="ts">
 	import Star from '$components/Star.svelte';
-	import type { Essay } from '$defs/content';
+	import type { Essay, FileList } from '$defs/content';
 	import { Autoplay, Pagination, Mousewheel } from 'swiper';
 	import { Swiper, SwiperSlide } from 'swiper/svelte';
 	import 'swiper/css';
@@ -23,9 +23,28 @@
 	import { marked } from 'marked';
 	import { getInfo } from '$lib/api/user';
 	import { browser } from '$app/env';
-	import { session } from '$app/stores';
+	import { page, session } from '$app/stores';
+	import Icon from '$components/Icon.svelte';
+	import Dialog from '$components/Dialog.svelte';
 
 	export let essay: Essay;
+
+	/** 是否显示资源 */
+	let showRes: boolean = browser && $page.url.hash === '#res';
+	/** 显示资源 */
+	const openRes = () => {
+		showRes = true;
+		setTimeout(() => (location.hash = 'res'), 1);
+	};
+	/** 资源promise */
+	let resPromise: Promise<FileList | string>;
+
+	/** 资源的内部状态 */
+	let stat: Record<string, { sha1: boolean }> = {};
+	const setInfo = (info: FileList): 1 => {
+		info.files.forEach((f) => (stat[f.id] = { sha1: false }));
+		return 1;
+	};
 </script>
 
 <svelte:head><title>{essay.title} - {$session.title}</title></svelte:head>
@@ -45,7 +64,9 @@
 					</div>
 				</li>
 			</ul>
-			<ul><li><button class="res-btn">获取资源</button></li></ul>
+			<ul>
+				<li><button class="res-btn" on:click={openRes}>获取资源</button></li>
+			</ul>
 		</nav>
 		<nav>
 			<ul>
@@ -104,6 +125,73 @@
 			{/each}
 		</Swiper>
 	</article>
+	{#if showRes || resPromise}
+		<article id="res" style:display={showRes ? '' : 'none'}>
+			<nav>
+				<ul>
+					<h2>资源</h2>
+				</ul>
+				<ul>
+					<button on:click={() => (showRes = false)}>收起</button>
+				</ul>
+			</nav>
+			{#await (resPromise = resPromise || listFile(fetch, essay.id))}
+				<span aria-busy="true" />
+			{:then info}
+				{#if !info || typeof info === 'string'}
+					<span>{info}</span>
+				{:else if setInfo(info)}
+					<table role="grid" id="res_list">
+						<thead>
+							<tr>
+								<th>文件名</th>
+								<th>大小</th>
+								<th>校验</th>
+								<th>下载</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each info.files as file}
+								<tr>
+									<td class="txt">{file.name}</td>
+									<td class="txt">{file.size}</td>
+									<td
+										class="icon"
+										on:click={() => {
+											stat[file.id] = { ...stat[file.id], sha1: true };
+										}}
+									>
+										<span data-tooltip="点击显示文件的SHA1值">
+											<Icon icon="xiaoyan" size={1.8} />
+										</span>
+									</td>
+									<td class="icon">
+										<span data-tooltip="点击下载此文件">
+											<Icon icon="24px" size={1.8} />
+										</span>
+									</td>
+								</tr>
+								<Dialog bind:open={stat[file.id].sha1}>
+									<h1>文件校验</h1>
+									<table>
+										<tr><td>内容ID</td><td>{essay.id}</td></tr>
+										<tr><td>文件ID</td><td>{file.id}</td></tr>
+										<tr><td>文件名称</td><td>{file.name}</td></tr>
+										<tr><td>文件SHA1</td><td>{file.sha1}</td></tr>
+									</table>
+								</Dialog>
+							{/each}
+						</tbody>
+						<tfoot>
+							<tr>
+								<td>共计 {info.amount} 个文件</td>
+							</tr>
+						</tfoot>
+					</table>
+				{/if}
+			{/await}
+		</article>
+	{/if}
 	<article>
 		{#if essay.type === 'markdown'}
 			{@html marked(essay.content)}
@@ -149,6 +237,9 @@
 	}
 	.visible-sm {
 		display: none;
+	}
+	#res_list .icon {
+		width: 10%;
 	}
 	@media (max-width: 768px) {
 		.visible-sm {
