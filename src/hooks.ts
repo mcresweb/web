@@ -1,5 +1,4 @@
 import { initStart, finishWaiter } from '$helpers/initer';
-// import { config } from '$lib/api/conf';
 import { config } from '$defs/config';
 import type { GetSession, Handle } from '@sveltejs/kit';
 

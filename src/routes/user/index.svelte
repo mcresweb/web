@@ -30,9 +30,6 @@
 	import type { MeLoginInfo } from '$defs/user';
 	import { browser } from '$app/env';
 	import { session } from '$app/stores';
-	import { scale } from 'svelte/transition';
-	import { quintOut } from 'svelte/easing';
-	import Catalogue from '../content/[catalogue].svelte';
 	import { blur } from 'svelte/transition';
 
 	const modules = browser && import.meta.glob('./_modules/*.svelte');
