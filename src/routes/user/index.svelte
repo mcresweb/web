@@ -30,6 +30,7 @@
 			? {
 					catalogue: '大分类',
 					category: '小分类',
+					'essay-upload': '新建内容',
 					admin: '监控面板',
 					icons: '图标列表',
 					vaptcha: '验证码',
@@ -50,11 +51,6 @@
 	let menu: Menus = getMenu();
 	$: nowModule = `./_modules/${menu}.svelte`;
 	$: menuIndex = menusKey.indexOf(menu);
-
-	const defH = 200;
-	let mainNavHeight: number = -1;
-	let mnh = 0;
-	$: mnh = Math.max(mnh >= defH ? 0 : mnh, mainNavHeight > 0 ? mainNavHeight : defH);
 
 	let isExpand = false;
 	/** 切换展开状态 */
@@ -88,13 +84,7 @@
 				</div>
 			{/if}
 			<div id="main" class="col-12" class:col-lg-9={!isExpand}>
-				<a
-					href="#{menusKey[menuIndex - 1]}"
-					class="nav visible-lg"
-					bind:offsetHeight={mainNavHeight}
-					style:max-height={menuIndex > 0 ? `${mnh + 1}px` : 0}
-					style:opacity={menuIndex > 0 ? 1 : 0}
-				>
+				<a href="#{menusKey[menuIndex - 1]}" class="nav visible-lg" class:show-nav={menuIndex > 0}>
 					<article>
 						<span>上一个: {menus[menusKey[menuIndex - 1]] || ''}</span>
 					</article>
@@ -121,9 +111,7 @@
 				<a
 					href="#{menusKey[menuIndex + 1]}"
 					class="nav visible-lg"
-					bind:offsetHeight={mainNavHeight}
-					style:max-height={menuIndex < menusKey.length - 1 ? `${mnh + 1}px` : 0}
-					style:opacity={menuIndex < menusKey.length - 1 ? 1 : 0}
+					class:show-nav={menuIndex < menusKey.length - 1}
 				>
 					<article>
 						<span>下一个: {menus[menusKey[menuIndex + 1]] || ''}</span>
@@ -154,8 +142,12 @@
 		white-space: nowrap;
 		padding: 0;
 		background-color: rgba(0, 0, 0, 0);
-		transition: max-height 0.5s;
 		overflow-y: hidden;
+		transform: scaleY(0);
+		transform-origin: 50% 0;
+	}
+	#main > a.nav.show-nav {
+		transform: scaleY(1);
 	}
 	#main > a.nav article span {
 		display: inline-block;
