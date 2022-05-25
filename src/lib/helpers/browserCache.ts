@@ -1,4 +1,4 @@
-import { browser } from '$app/env';
+import { browser, dev } from '$app/env';
 import type { Catalogue, Category } from '$defs/content';
 import type { MaybePromise } from '@sveltejs/kit/types/private';
 
@@ -39,7 +39,7 @@ export const getCache = <T extends names>(
 	type: T,
 	sub: string | undefined | null = undefined,
 ): types[T] | null => {
-	if (!browser || !sessionStorage) return null;
+	if (!browser || !sessionStorage || dev) return null;
 	const data = sessionStorage.getItem(prefix + type + (sub || ''));
 	return data === null ? null : JSON.parse(data);
 };

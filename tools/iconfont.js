@@ -20,7 +20,7 @@ const file = [
 	`/** 图标信息, id - 名称 */`,
 	`export type IconInfos = {${icons}};`,
 	`/** 图标信息, id - 名称 */`,
-	`const infos: IconInfos = {${icons}} as const;`,
+	`export const infos: IconInfos = {${icons}} as const;`,
 	`/** 图标ID */`,
 	`export type Icons = keyof IconInfos;`,
 	`/** 图标ID */`,

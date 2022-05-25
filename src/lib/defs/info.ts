@@ -7,3 +7,10 @@ export type BasicInfo = {
 	/**用户数量 */ user: number;
 	/**建站天数 */ day: number;
 };
+
+/**
+ * 注册信息
+ */
+export type RegisterInfo = {
+	/**用户名最大长度*/ nameLen: number;
+};

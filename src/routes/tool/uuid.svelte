@@ -4,7 +4,7 @@
 	import { v4 } from '@lukeed/uuid';
 
 	let amount: number = 10;
-	let useG: any = false;
+	let useG: any = true;
 	let uuid: string;
 	const summon = () => (uuid = Array(amount).fill(0).map(v4).join('\n'));
 	$: if (browser && amount) summon();

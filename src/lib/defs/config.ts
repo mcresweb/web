@@ -3,16 +3,19 @@ import fs from 'fs';
 import { Document, isMap, isScalar, parse } from 'yaml';
 import { initFinish, startWaiter } from '../helpers/initer';
 import deepmerge from 'deepmerge';
+import { setApiUrl } from './FetchFunction.type';
 
 /**默认配置文件*/
 const confDefault = {
 	/** 网站标题 */
 	title: '我的世界资源网站',
+	API_URL: 'http://localhost',
 };
 /**配置文件描述*/
 const confComment: Comment = {
 	__node_comment__: '前端配置文件',
 	title: '网站标题',
+	API_URL: '后端地址(仅由前端服务器使用, 可以指定反向代理/直接地址)',
 };
 /**配置文件*/
 export let config: Config;
@@ -48,6 +51,9 @@ export let config: Config;
 	}
 	const confUser = parse(fs.readFileSync(file, 'utf8'), {});
 	config = deepmerge(confDefault, confUser, { arrayMerge: (_def, user) => user, clone: true });
+
+	setApiUrl(config.API_URL);
+
 	initFinish('conf');
 })();
 

@@ -9,7 +9,7 @@ export type Catalogue = {
 	/**大分类唯一标识 */
 	key: string;
 	/**大分类的图片*/
-	img: string;
+	img?: string;
 };
 /**
  * 一个小分类信息
@@ -22,7 +22,7 @@ export type Category = {
 	/**小分类唯一标识 */
 	key: string;
 	/**小分类的图片*/
-	img: string;
+	img?: string;
 };
 /**
  * 内容列表
@@ -109,3 +109,33 @@ export type FileInfo = {
 	/** sha1验证 */
 	sha1: string;
 };
+
+/**
+ * 修改大分类请求
+ */
+export type ModCatalogueRequest =
+	| { key: string }
+	| {
+			index: string;
+			key: string;
+			name: string;
+			img?: string;
+	  };
+/**
+ * 修改小分类请求
+ */
+export type ModCategoryRequest =
+	| {
+			key: string;
+			catalogue: string;
+	  }
+	| {
+			catalogue: string;
+			key: string;
+			name: string;
+			index: string;
+			img?: string;
+	  };
+
+/** 修改响应 */
+export type ModResp = { success: false; err: string } | { success: true };

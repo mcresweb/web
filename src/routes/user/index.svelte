@@ -6,14 +6,35 @@
 	export const load: Load = async ({ fetch }) => {
 		if (!browser) return {};
 		const user = await getMe(fetch);
-		if (!user.login) return { status: 302, redirect: loginUrl() };
+		if (!user || !user.login) return { status: 302, redirect: loginUrl() };
 		return { props: { user } };
 	};
+</script>
+
+<script lang="ts">
+	import type { MeLoginInfo } from '$defs/user';
+	import { browser } from '$app/env';
+	import { session } from '$app/stores';
+	import { blur } from 'svelte/transition';
+	import Icon from '$components/Icon.svelte';
+
+	const modules = browser && import.meta.glob('./_modules/*.svelte');
+
+	export let user: MeLoginInfo;
 
 	type Menus = keyof typeof menus;
 	/** 菜单名称 */
 	const menus = {
-		basic: '基础信息',
+		basic: '用户信息',
+		...(user && user.admin
+			? {
+					catalogue: '大分类',
+					category: '小分类',
+					admin: '监控面板',
+					icons: '图标列表',
+					vaptcha: '验证码',
+			  }
+			: undefined),
 		logout: '登出',
 	};
 	/** 菜单列表*/
@@ -24,17 +45,6 @@
 		if (menus[hash as Menus]) return hash as Menus;
 		return 'basic';
 	};
-</script>
-
-<script lang="ts">
-	import type { MeLoginInfo } from '$defs/user';
-	import { browser } from '$app/env';
-	import { session } from '$app/stores';
-	import { blur } from 'svelte/transition';
-
-	const modules = browser && import.meta.glob('./_modules/*.svelte');
-
-	export let user: MeLoginInfo;
 
 	/** 页面锚点 */
 	let menu: Menus = getMenu();
@@ -45,31 +55,39 @@
 	let mainNavHeight: number = -1;
 	let mnh = 0;
 	$: mnh = Math.max(mnh >= defH ? 0 : mnh, mainNavHeight > 0 ? mainNavHeight : defH);
+
+	let isExpand = false;
+	/** 切换展开状态 */
+	const expand = () => {
+		isExpand = !isExpand;
+	};
 </script>
 
 <svelte:window on:hashchange={() => (menu = getMenu())} />
-<svelte:head><title>用户 - {$session.title}</title></svelte:head>
+<svelte:head><title>设置 - {$session.title}</title></svelte:head>
 
 {#if browser && !user}
 	<h3>内部出错</h3>
 {:else if browser}
 	<div class="container">
 		<div class="row">
-			<div id="menu" class="col-lg-3 hidden-lg">
-				<article>
-					<h4>用户设置</h4>
-					<aside>
-						<nav>
-							<ul>
-								{#each menusKey as m (m)}
-									<li><a class:active={m === menu} href="#{m}">{menus[m]}</a></li>
-								{/each}
-							</ul>
-						</nav>
-					</aside>
-				</article>
-			</div>
-			<div id="main" class="col-lg-9 col-12">
+			{#if !isExpand}
+				<div id="menu" class="col-lg-3 hidden-lg">
+					<article>
+						<h4>设置</h4>
+						<aside>
+							<nav>
+								<ul>
+									{#each menusKey as m (m)}
+										<li><a class:active={m === menu} href="#{m}">{menus[m]}</a></li>
+									{/each}
+								</ul>
+							</nav>
+						</aside>
+					</article>
+				</div>
+			{/if}
+			<div id="main" class="col-12" class:col-lg-9={!isExpand}>
 				<a
 					href="#{menusKey[menuIndex - 1]}"
 					class="nav visible-lg"
@@ -82,11 +100,20 @@
 					</article>
 				</a>
 				<article id={menu}>
-					<h3>{menus[menu]}</h3>
+					<nav>
+						<ul>
+							<li><h3>{menus[menu]}</h3></li>
+						</ul>
+						<ul class="hidden-lg-inline">
+							<li style:vertical-align="top" style:cursor="pointer" on:click={expand}>
+								<Icon icon="expand" />
+							</li>
+						</ul>
+					</nav>
 					{#if browser && nowModule && modules && modules[nowModule]}
 						{#await modules[nowModule]() then m}
 							<span in:blur>
-								<svelte:component this={m.default} {user} />
+								<svelte:component this={m.default} {user} bind:isExpand />
 							</span>
 						{/await}
 					{/if}
@@ -136,6 +163,9 @@
 		max-width: 100%;
 	}
 
+	.hidden-lg-inline {
+		display: none;
+	}
 	.hidden-lg {
 		display: none;
 	}
@@ -143,6 +173,9 @@
 		display: block;
 	}
 	@media (min-width: 992px) {
+		.hidden-lg-inline {
+			display: inline;
+		}
 		.hidden-lg {
 			display: block;
 		}

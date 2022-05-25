@@ -28,5 +28,6 @@
 		height: 62px;
 		box-shadow: 0 0 5px #999;
 		padding: 0 10px;
+		background-color: #fff;
 	}
 </style>

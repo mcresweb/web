@@ -1,5 +1,14 @@
-import type { Catalogue, Category, Essay, EssayList, FileList } from '$defs/content';
-import type { FetchFunction } from '$defs/FetchFunction.type';
+import type {
+	Catalogue,
+	Category,
+	Essay,
+	EssayList,
+	FileList,
+	ModCatalogueRequest,
+	ModCategoryRequest,
+	ModResp,
+} from '$defs/content';
+import { API_URL, type FetchFunction } from '$defs/FetchFunction.type';
 import { cacheOrGet } from '$helpers/browserCache';
 
 /**
@@ -10,7 +19,7 @@ import { cacheOrGet } from '$helpers/browserCache';
  */
 export const listCatalogue = async (f: FetchFunction): Promise<Catalogue[]> => {
 	const data = await cacheOrGet('listCatalogue', null, async () => {
-		const resp = await f('/api/content/list-catalogue');
+		const resp = await f(`${API_URL}/api/content/list-catalogue`);
 		if (!resp.ok) throw new Error();
 		return await resp.json();
 	});
@@ -27,7 +36,7 @@ export const listCategory = async (
 	catalogue: string,
 ): Promise<Category[] | null> => {
 	const data = await cacheOrGet('listCategory', catalogue, async () => {
-		const resp = await f(`/api/content/list-category?catalogue=${catalogue}`);
+		const resp = await f(`${API_URL}/api/content/list-category?catalogue=${catalogue}`);
 		if (!resp.ok) return null;
 		return await resp.json();
 	});
@@ -49,7 +58,7 @@ export const listEssay = async (
 	page: number = 1,
 ): Promise<EssayList | null> => {
 	const resp = await f(
-		`/api/content/list-essay?catalogue=${catalogue}&category=${category}&page=${page}`,
+		`${API_URL}/api/content/list-essay?catalogue=${catalogue}&category=${category}&page=${page}`,
 	);
 	if (!resp.ok) return null;
 	const data: EssayList = await resp.json();
@@ -64,10 +73,47 @@ export const listEssay = async (
  */
 export const getEssay = async (f: FetchFunction, id: number): Promise<Essay | null> => {
 	if (isNaN(id)) return null;
-	const resp = await f(`/api/content/essay?id=${id}`);
+	const resp = await f(`${API_URL}/api/content/essay?id=${id}`);
 	if (!resp.ok) return null;
 	return await resp.json();
 };
+/**
+ * 修改大分类
+ * @param f fetch
+ * @param data 修改数据
+ * @returns 修改响应
+ */
+export const modCatalogue = async (
+	f: FetchFunction,
+	data: ModCatalogueRequest,
+): Promise<ModResp> => {
+	const resp = await f(`${API_URL}/api/content/mod-catalogue`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(data),
+	});
+	return await resp.json();
+};
+
+/**
+ * 修改小分类
+ * @param f fetch
+ * @param data 修改数据
+ * @returns 修改响应
+ */
+export const modCategory = async (f: FetchFunction, data: ModCategoryRequest): Promise<ModResp> => {
+	const resp = await f(`${API_URL}/api/content/mod-category`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(data),
+	});
+	return await resp.json();
+};
+
 /**
  * 列出内容的文件列表
  * @param f fetch
@@ -76,7 +122,7 @@ export const getEssay = async (f: FetchFunction, id: number): Promise<Essay | nu
  */
 export const listFile = async (f: FetchFunction, essay: number): Promise<FileList | string> => {
 	if (isNaN(essay)) return '无效essay ID';
-	const resp = await f(`/api/content/list-file?essay=${essay}`);
+	const resp = await f(`${API_URL}/api/content/list-file?essay=${essay}`);
 	if (!resp.ok) return resp.statusText;
 	const info: FileList | { success: false; err: string } = await resp.json();
 	if (!info.success) return info.err;
