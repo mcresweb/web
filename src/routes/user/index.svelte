@@ -145,6 +145,7 @@
 		overflow-y: hidden;
 		transform: scaleY(0);
 		transform-origin: 50% 0;
+		transition: transform 0.3s;
 	}
 	#main > a.nav.show-nav {
 		transform: scaleY(1);

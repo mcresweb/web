@@ -58,7 +58,7 @@ export type Essay = {
 	/** 小分类 */
 	category: string;
 	/** 发布者UUID */
-	sender: string;
+	sender: number;
 	/** 内容标题 */
 	title: string;
 	/** 评分 */
@@ -78,6 +78,29 @@ export type Essay = {
 	/** 简略描述 */
 	description?: string;
 };
+/**
+ * 一个新建内容的数据
+ */
+export type EssayUpload = {
+	/** 大分类 */
+	catalogue: string;
+	/** 小分类 */
+	category: string;
+	/** 内容标题 */
+	title: string;
+	/** 介绍图片 */
+	imgs: string[];
+	/** 内容文章 */
+	content: string;
+	/** 内容文章的类型 */
+	type: ContentType;
+	/** 内容标签 */
+	tags?: string[];
+	/** 简略描述 */
+	description?: string;
+};
+/** 上传响应 */
+export type UploadResp<T = number> = { success: true; id: T } | { success: false; err: string };
 
 /** 允许的文章类型 */
 export const contentType = ['markdown', 'html', 'bbcode', 'text'] as const;

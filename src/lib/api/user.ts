@@ -23,11 +23,11 @@ export const getMe = async (f: FetchFunction): Promise<MeInfo> => {
 /**
  * 获取其他用户数据
  * @param f fetch
- * @param uuid 用户UUID
+ * @param id 用户ID
  * @returns 用户数据 / 找不到用户
  */
-export const getInfo = async (f: FetchFunction, uuid: string): Promise<UserInfo | null> => {
-	const resp = await f(`${API_URL}/api/user/info?id=${uuid}`);
+export const getInfo = async (f: FetchFunction, id: number): Promise<UserInfo | null> => {
+	const resp = await f(`${API_URL}/api/user/info?id=${id}`);
 	if (!resp.ok) return null;
 	return await resp.json();
 };

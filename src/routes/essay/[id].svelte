@@ -22,10 +22,11 @@
 	import { imgUrl } from '$lib/api/img';
 	import { marked } from 'marked';
 	import { getInfo } from '$lib/api/user';
-	import { browser } from '$app/env';
+	import { browser, dev } from '$app/env';
 	import { page, session } from '$app/stores';
 	import Icon from '$components/Icon.svelte';
 	import Dialog from '$components/Dialog.svelte';
+	import { bbcode } from '$helpers/bbcode';
 
 	export let essay: Essay;
 
@@ -92,9 +93,9 @@
 			<ul>
 				<li>发布者:</li>
 				{#await browser && essay.sender && getInfo(fetch, essay.sender)}
-					<li>{(essay.sender || '').substring(0, 8)}</li>
+					<li>{essay.sender || ''}</li>
 				{:then user}
-					<li>{(user && user.name) || (essay.sender || '').substring(0, 8)}</li>
+					<li>{(user && user.name) || essay.sender || ''}</li>
 				{/await}
 			</ul>
 		</nav>
@@ -112,18 +113,20 @@
 			<p>{essay.description}</p>
 		{/if}
 		<hr />
-		<Swiper
-			modules={[Pagination, Autoplay, Mousewheel]}
-			spaceBetween={50}
-			slidesPerView={1}
-			pagination={{ clickable: true }}
-			autoplay={true}
-			loop={true}
-		>
-			{#each essay.imgs as uuid}
-				<SwiperSlide><img alt="" src={imgUrl(uuid)} /></SwiperSlide>
-			{/each}
-		</Swiper>
+		{#if essay.imgs}
+			<Swiper
+				modules={[Pagination, Autoplay, Mousewheel]}
+				spaceBetween={50}
+				slidesPerView={1}
+				pagination={{ clickable: true }}
+				autoplay={true}
+				loop={true}
+			>
+				{#each essay.imgs as uuid}
+					<SwiperSlide><img alt="" src={imgUrl(uuid)} /></SwiperSlide>
+				{/each}
+			</Swiper>
+		{/if}
 	</article>
 	{#if showRes || resPromise}
 		<article id="res" style:display={showRes ? '' : 'none'}>
@@ -196,7 +199,7 @@
 		{#if essay.type === 'markdown'}
 			{@html marked(essay.content)}
 		{:else if essay.type === 'bbcode'}
-			bbcode
+			{@html bbcode(essay.content)}
 		{:else if essay.type === 'html'}
 			{@html essay.content}
 		{:else if essay.type === 'text'}
@@ -208,6 +211,15 @@
 				<br />
 				请您联系网站管理员来解决这个问题
 			</p>
+		{/if}
+	</article>
+</div>
+
+<div class="container">
+	<article>
+		<h1>调试数据</h1>
+		{#if dev}
+			<pre>{JSON.stringify(essay, null, 4)}</pre>
 		{/if}
 	</article>
 </div>

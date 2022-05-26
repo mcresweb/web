@@ -3,10 +3,12 @@ import type {
 	Category,
 	Essay,
 	EssayList,
+	EssayUpload,
 	FileList,
 	ModCatalogueRequest,
 	ModCategoryRequest,
 	ModResp,
+	UploadResp,
 } from '$defs/content';
 import { API_URL, type FetchFunction } from '$defs/FetchFunction.type';
 import { cacheOrGet } from '$helpers/browserCache';
@@ -111,6 +113,24 @@ export const modCategory = async (f: FetchFunction, data: ModCategoryRequest): P
 		},
 		body: JSON.stringify(data),
 	});
+	return await resp.json();
+};
+/**
+ * 上传内容
+ * @param f fetch
+ * @param data 内容数据
+ * @returns 上传结果
+ */
+export const uploadEssay = async (
+	f: FetchFunction,
+	data: EssayUpload,
+): Promise<UploadResp<number>> => {
+	const resp = await f(`${API_URL}/api/content/upload-essay`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(data),
+	});
+	if (!resp.ok) return { success: false, err: `${resp.status} ${resp.statusText}` };
 	return await resp.json();
 };
 

@@ -15,7 +15,7 @@ export const get: RequestHandler = async (event): ApiResp<Essay | null> => {
 			id,
 			catalogue: 'maps',
 			category: 'game',
-			sender: 'b9d692a8348d639843f5c67c0ec03587',
+			sender: 1,
 			title: '一款游戏地图',
 			star: hasStar ? Math.random() * 5 : undefined,
 			starAmount: hasStar ? (Math.random() * 1000) | 0 : undefined,
