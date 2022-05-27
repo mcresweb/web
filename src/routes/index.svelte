@@ -120,14 +120,29 @@
 		font-size: 1.5em;
 	}
 	#head {
-		height: calc(100vh - 62px);
+		/* height: calc(100vh - 62px); */
 		position: relative;
 	}
 	#head > article {
+		--box-color: #efdfef;
+		--background-color: #fffaff;
+		--box-color-dark: #03233f;
+		--background-color-dark: #18222b;
 		margin-top: 5vh;
-		box-shadow: 0px 0px 30px #efdfef;
-		background-color: #fffaff;
+		box-shadow: 0px 0px 30px var(--box-color);
+		background-color: var(--background-color);
 	}
+	@media only screen and (prefers-color-scheme: dark) {
+		:global(*):not([data-theme='light']) #head > article {
+			--box-color: var(--box-color-dark);
+			--background-color: var(--background-color-dark);
+		}
+	}
+	:global([data-theme='dark']) #head > article {
+		--box-color: var(--box-color-dark);
+		--background-color: var(--background-color-dark);
+	}
+
 	#welcome h1 {
 		--font-size: 2.5rem;
 		font-size: 2rem;

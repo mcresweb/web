@@ -1,9 +1,16 @@
 <script context="module" lang="ts">
-	import { contentUrl, getEssay, listFile } from '$lib/api/content';
+	import { contentUrl, getEssay, getRandomEssay, listFile } from '$lib/api/content';
 	import type { Load } from '@sveltejs/kit';
 
+	const random = 'random';
+
 	export const load: Load = async ({ fetch, params }) => {
-		const essay = await getEssay(fetch, parseInt(params.id));
+		let essay: Essay | null;
+		if (params.id === random) {
+			essay = await getRandomEssay(fetch);
+		} else {
+			essay = await getEssay(fetch, parseInt(params.id));
+		}
 		if (!essay) return { status: 404 };
 		return {
 			props: { essay },
@@ -29,6 +36,7 @@
 	import { bbcode } from '$helpers/bbcode';
 
 	export let essay: Essay;
+	if (browser && $page.params.id == random) history.replaceState(null, '', './' + essay.id);
 
 	/** 是否显示资源 */
 	let showRes: boolean = browser && $page.url.hash === '#res';

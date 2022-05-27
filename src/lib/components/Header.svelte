@@ -25,9 +25,9 @@
 
 <style>
 	header {
-		height: 62px;
+		height: var(--header-height);
 		box-shadow: 0 0 5px #999;
 		padding: 0 10px;
-		background-color: #fff;
+		background-color: var(--card-background-color);
 	}
 </style>

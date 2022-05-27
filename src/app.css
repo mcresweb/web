@@ -1,11 +1,12 @@
 a {
 	text-decoration: none;
-	color: #000;
+	color: var(--base-color);
 }
 
 /* 亮色方案(默认) */
 [data-theme='light'],
 :root:not([data-theme='dark']) {
+	--base-color: #415462;
 	--primary: #fb8c00;
 	--primary-hover: #f57c00;
 	--primary-focus: rgba(251, 140, 0, 0.125);
@@ -16,6 +17,7 @@ a {
 /* 如果用户已启用暗模式, 则自动启用 */
 @media only screen and (prefers-color-scheme: dark) {
 	:root:not([data-theme='light']) {
+		--base-color: #bbc6ce;
 		--primary: #fb8c00;
 		--primary-hover: #ff9800;
 		--primary-focus: rgba(251, 140, 0, 0.25);
@@ -26,6 +28,7 @@ a {
 /* 暗色方案 (强制) */
 /* 如果强制使用data-theme="dark"则启用 */
 [data-theme='dark'] {
+	--base-color: #bbc6ce;
 	--primary: #fb8c00;
 	--primary-hover: #ff9800;
 	--primary-focus: rgba(251, 140, 0, 0.25);
@@ -42,4 +45,8 @@ a {
 
 nav {
 	white-space: nowrap;
+}
+
+* {
+	transition: background-color 0.1s;
 }

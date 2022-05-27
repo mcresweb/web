@@ -42,6 +42,15 @@
 		cursor: pointer;
 		position: relative;
 	}
+
+	@media only screen and (prefers-color-scheme: dark) {
+		:global(*):not([data-theme='light']) .icon-box {
+			background-color: var(--background-color);
+		}
+	}
+	:global([data-theme='dark']) .icon-box {
+		background-color: var(--background-color);
+	}
 	.icon-box .name {
 		margin-top: 20px;
 	}

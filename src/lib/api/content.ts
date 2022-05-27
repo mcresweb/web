@@ -80,6 +80,16 @@ export const getEssay = async (f: FetchFunction, id: number): Promise<Essay | nu
 	return await resp.json();
 };
 /**
+ * 随机获取一个内容, 由后端决定
+ * @param f fetch
+ * @returns 内容 / 找不到内容
+ */
+export const getRandomEssay = async (f: FetchFunction): Promise<Essay | null> => {
+	const resp = await f(`${API_URL}/api/content/random-essay`);
+	if (!resp.ok) return null;
+	return await resp.json();
+};
+/**
  * 修改大分类
  * @param f fetch
  * @param data 修改数据
