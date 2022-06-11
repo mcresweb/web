@@ -6,20 +6,30 @@
 	const closingClass = 'modal-is-closing';
 	const animationDuration = 400; // ms
 
-	/** 是否打开 */
-	export let open: boolean = false;
+	/**
+	 * 是否打开
+	 *
+	 * 布尔值代表有动画, 数字值代表无动画
+	 *
+	 * `true` / `1`: 打开, `false` / `0`: 关闭
+	 *  */
+	export let open: boolean | 1 | 0 = false;
 	/** 当前是否打开 */
 	let open0: boolean = false;
 	/** 是否正在执行动画 */
 	let running: boolean = false;
 
-	$: if (!running && open != open0) {
-		if (open) openModal();
-		else closeModal();
+	$: if (!running && !!open != open0) {
+		if (open) openModal(open !== 1);
+		else closeModal(open !== 0);
 	}
 
 	// Close modal
-	const closeModal = () => {
+	const closeModal = (animation: boolean) => {
+		if (!animation) {
+			open0 = open = false;
+			return;
+		}
 		running = true;
 		document.documentElement.classList.add(closingClass);
 		setTimeout(() => {
@@ -29,7 +39,11 @@
 		}, animationDuration);
 	};
 	// Open modal
-	const openModal = () => {
+	const openModal = (animation: boolean) => {
+		if (!animation) {
+			open0 = open = true;
+			return;
+		}
 		running = true;
 		document.documentElement.classList.add(isOpenClass, openingClass);
 		setTimeout(() => {
@@ -53,9 +67,16 @@
 	let me: HTMLElement;
 </script>
 
-<dialog bind:this={me} {open} on:click={click}>
+<dialog bind:this={me} open={!!open} on:click={click}>
 	<article>
 		<span style:cursor="opinter" aria-label="Close" class="close" on:click={() => (open = false)} />
 		<slot />
 	</article>
 </dialog>
+
+<style>
+	article {
+		min-width: 50vw;
+		min-height: 50vh;
+	}
+</style>

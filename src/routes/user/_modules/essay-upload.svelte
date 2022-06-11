@@ -1,17 +1,24 @@
 <script lang="ts">
+	import type { ImgUploaderFunc, SubmitStat } from '$helpers/imgs';
 	import { contentType, type Category, type EssayUpload } from '$defs/content';
 	import { essayUrl, listCatalogue, listCategory, uploadEssay } from '$lib/api/content';
-	import { dev } from '$app/env';
+	import { browser, dev } from '$app/env';
 	import { marked } from 'marked';
 	import { bbcode, supportTags } from '$helpers/bbcode';
 	import Dialog from '$components/Dialog.svelte';
 	import { goto } from '$app/navigation';
+	import ImgUploader from '$components/ImgUploader.svelte';
+	import { allowDrop, drop } from '$helpers/drag-event';
+	import Progress from '$components/Progress.svelte';
+	import type { ImgUsing } from '$defs/img';
 
 	export let isExpand: boolean = true;
 	const expand = () => (isExpand = true);
 
 	/** 原始数据 */
-	const raw: EssayUpload = {} as any;
+	const raw: EssayUpload = browser ? JSON.parse(localStorage.getItem('aaa') || '{}') : ({} as any);
+
+	$: if (browser) localStorage.setItem('aaa', JSON.stringify(raw));
 
 	//小分类处理
 	let oldCatalogue: string = '';
@@ -30,13 +37,22 @@
 	/** 正文预览 */
 	let preview = false;
 
+	/**
+	 * 预览模式的文字翻译
+	 *
+	 * 将图片代码转换为图片路径
+	 * @param txt 输入文字
+	 * @returns 输出文字
+	 */
+	let transText: (txt: string) => string = (txt) => txt;
+
 	/** 是否禁止上传 */
 	$: disabled =
 		uploading || !(raw.catalogue && raw.category && raw.content && raw.title && raw.type);
 	/** 提示检查框的打开状态 */
 	let checkDialogOpen: boolean;
 	/** 提示确认框的打开状态 */
-	let confirmDialogOpen: boolean;
+	let confirmDialogOpen: boolean | 1 | 0;
 	/** 显示错误的打开状态 */
 	let errDialogOpen: boolean;
 	/** 显示的错误 */
@@ -52,18 +68,40 @@
 	};
 	/**上传状态*/
 	let uploading: boolean;
+	let uploadImgFunc: ImgUploaderFunc | undefined;
+	let uploadImgStatus: Record<string, SubmitStat>;
+	let getImgs: () => Record<string, ImgUsing>;
 	const upload = async () => {
+		uploadImgStatus = {};
 		uploading = true;
 		try {
+			if (
+				!(await uploadImgFunc!(raw.content, (stat) => {
+					uploadImgStatus = stat;
+				}))
+			) {
+				showErr = [
+					'上传图片失败: ',
+					...Object.values(uploadImgStatus).map(
+						(x) => `<p>${x.name}<br>${(x.now || 0) < 0 ? x.msg : '成功'}</p>`,
+					),
+				].join('<br>');
+				errDialogOpen = true;
+				return;
+			}
+			raw.content = transText(raw.content);
+			raw.imgs = getImgs();
 			const resp = await uploadEssay(fetch, raw);
 			// confirmDialogOpen = false;
 			if (resp.success) goto(essayUrl(resp.id));
 			else (showErr = resp.err), (errDialogOpen = true);
 		} finally {
 			uploading = false;
-			confirmDialogOpen = false;
+			confirmDialogOpen = 0;
 		}
 	};
+
+	let contentInput: HTMLTextAreaElement;
 </script>
 
 <div on:click={expand}>
@@ -144,13 +182,13 @@
 				<div class="preview">
 					{#if raw.content}
 						{#if raw.type === 'markdown'}
-							{@html marked(raw.content)}
+							{@html marked(transText(raw.content))}
 						{:else if raw.type === 'bbcode'}
-							{@html bbcode(raw.content)}
+							{@html bbcode(transText(raw.content))}
 						{:else if raw.type === 'html'}
-							{@html raw.content}
+							{@html transText(raw.content)}
 						{:else if raw.type === 'text'}
-							{raw.content}
+							{transText(raw.content)}
 						{:else}
 							<h3 style:color="var(--bs-danger)">错误: 未知的正文类型</h3>
 						{/if}
@@ -159,7 +197,21 @@
 					{/if}
 				</div>
 			{:else}
-				<textarea id="content" placeholder="内容的正文" bind:value={raw.content} />
+				<textarea
+					id="content"
+					placeholder="内容的正文"
+					bind:value={raw.content}
+					bind:this={contentInput}
+					on:drop={(e) =>
+						drop(e, (txt) => {
+							const content = raw.content || '';
+							raw.content =
+								content.substring(0, contentInput.selectionStart) +
+								txt +
+								content.substring(contentInput.selectionEnd);
+						})}
+					on:dragover={allowDrop}
+				/>
 				<small>
 					右下角可以拖动调整高度, 推荐使用本地编辑器编辑完成后再粘贴至此
 					{#if raw.type === 'bbcode'}
@@ -173,6 +225,7 @@
 				</small>
 			{/if}
 		</label>
+		<ImgUploader bind:transText bind:upload={uploadImgFunc} bind:getImgs />
 		<label for="tags">
 			标签
 			<div id="tags" class="grid">
@@ -196,13 +249,6 @@
 			</div>
 		</label>
 		<button {disabled} on:click={uploadConfirm}>上传</button>
-		<ul>
-			<li>checkDialogOpen {checkDialogOpen}</li>
-			<li>confirmDialogOpen {confirmDialogOpen}</li>
-			<li>errDialogOpen {errDialogOpen}</li>
-			<li>showErr {showErr}</li>
-			<li>uploading {uploading}</li>
-		</ul>
 	</div>
 	<Dialog bind:open={checkDialogOpen}>
 		<h2>请检查</h2>
@@ -212,7 +258,28 @@
 	<Dialog bind:open={confirmDialogOpen}>
 		{#if uploading}
 			<h2>上传中</h2>
-			<progress />
+
+			{#if uploadImgStatus}
+				<table>
+					{#each Object.keys(uploadImgStatus) as k (k)}
+						{@const stat = uploadImgStatus[k]}
+						<tr> <td>{stat.name}</td></tr>
+						<tr>
+							<td>
+								<Progress
+									value={(stat.now || 0) < 0 ? stat.tot || 1 : stat.now}
+									max={stat.tot || 1}
+									txt={stat.msg}
+									color={(stat.now || 0) < 0 ? '#d9534f' : stat.over ? '#5cb85c' : '#5bc0de'}
+									floatTxt
+								/>
+							</td>
+						</tr>
+					{/each}
+				</table>
+			{:else}
+				<progress />
+			{/if}
 		{:else}
 			<h2>确认上传内容吗?</h2>
 			上传后将不可删除(仅可以锁定和修改)
@@ -224,10 +291,17 @@
 	</Dialog>
 	<Dialog bind:open={errDialogOpen}>
 		<h2>发生错误</h2>
-		{showErr}
+		{@html showErr}
 	</Dialog>
 	{#if dev}
 		<h5>开发模式预览:</h5>
+		<ul>
+			<li>checkDialogOpen {checkDialogOpen}</li>
+			<li>confirmDialogOpen {confirmDialogOpen}</li>
+			<li>errDialogOpen {errDialogOpen}</li>
+			<li>showErr {showErr}</li>
+			<li>uploading {uploading}</li>
+		</ul>
 		<pre>{JSON.stringify(raw, null, 4)}</pre>
 	{/if}
 </div>

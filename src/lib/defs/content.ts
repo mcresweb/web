@@ -1,3 +1,5 @@
+import type { ImgUsing } from './img';
+
 /**
  * 一个大分类信息
  */
@@ -89,7 +91,7 @@ export type EssayUpload = {
 	/** 内容标题 */
 	title: string;
 	/** 介绍图片 */
-	imgs: string[];
+	imgs: Record<string, ImgUsing>;
 	/** 内容文章 */
 	content: string;
 	/** 内容文章的类型 */
