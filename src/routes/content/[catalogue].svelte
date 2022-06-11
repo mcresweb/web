@@ -34,7 +34,7 @@
 
 	$: cataKey = $page.params.catalogue;
 	$: cata = catalogue[cataKey];
-	$: cateKey = ($page.url.hash || '').substring(1);
+	$: cateKey = decodeURIComponent(($page.url.hash || '').substring(1));
 	$: if (browser && cata) updateCate(cateKey);
 
 	/** 是否正在加载小分类 */
@@ -61,7 +61,9 @@
 	const flyData = { y: 20, duration: 800, easing: quintOut };
 </script>
 
-<svelte:window on:hashchange={() => (cateKey = (location.hash || '').substring(1))} />
+<svelte:window
+	on:hashchange={() => (cateKey = decodeURIComponent((location.hash || '').substring(1)))}
+/>
 <svelte:head><title>内容列表 - {$session.title}</title></svelte:head>
 
 {#await cata ? delay() : null then _}
