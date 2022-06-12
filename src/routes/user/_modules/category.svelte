@@ -63,6 +63,8 @@
 
 		return r;
 	};
+	/**判断是否是有效的key*/
+	const invalid = (str: string) => !/^[0-9a-z-_]+$/.test(str);
 
 	const modFunc = {
 		del: async (key: string) => {
@@ -127,7 +129,7 @@
 								bind:value={edit[i].key}
 								aria-invalid={edit[i].key == cate.key
 									? undefined
-									: category.some((x) => x.key == edit[i].key)}
+									: invalid(edit[i].key) || category.some((x) => x.key == edit[i].key)}
 							/>
 						</td>
 						<td>
@@ -146,7 +148,8 @@
 										!edit[i].key ||
 										!edit[i].title ||
 										isNaN(edit[i].index || NaN /**empty string*/) ||
-										(edit[i].key != cate.key && category.some((x) => x.key == edit[i].key))}
+										(edit[i].key != cate.key &&
+											(invalid(edit[i].key) || category.some((x) => x.key == edit[i].key)))}
 									class="mod"
 									on:click={() => modFunc.mod(edit[i])}>修改</button
 								>
@@ -174,7 +177,9 @@
 						<input
 							{disabled}
 							bind:value={adder.key}
-							aria-invalid={adder.key ? category.some((x) => x.key == adder.key) : undefined}
+							aria-invalid={adder.key
+								? invalid(adder.key) || category.some((x) => x.key == adder.key)
+								: undefined}
 						/>
 					</td>
 					<td>
@@ -190,6 +195,7 @@
 								isNaN(adder.index || NaN /**empty string*/) ||
 								!adder.key ||
 								!adder.title ||
+								invalid(adder.key) ||
 								category.some((x) => x.key == adder.key)}
 							on:click={() => modFunc.mod(adder)}>添加</button
 						>

@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { dev } from '$app/env';
+	import { devInit } from '$helpers/dev-init';
+
 	const toggleDarkMode = () => {
 		const darkMode_name = 'MCRESWEB-THEME';
 		const darkMode_dark = 'dark';
@@ -13,6 +16,12 @@
 		}
 	};
 </script>
+
+<svelte:head>
+	{#if dev}
+		<script src="/sha256.js"></script>
+	{/if}
+</svelte:head>
 
 <div class="footer">
 	<div class="container">
@@ -81,9 +90,16 @@
 						</tr>
 						<tr>
 							<td>
-								<span href="/essay/random" on:click={toggleDarkMode}>切换主题</span>
+								<span on:click={toggleDarkMode}>切换主题</span>
 							</td>
 						</tr>
+						{#if dev}
+							<tr>
+								<td>
+									<span on:click={devInit}>开发者初始化</span>
+								</td>
+							</tr>
+						{/if}
 					</tbody>
 				</table>
 			</div>

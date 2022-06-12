@@ -18,11 +18,18 @@ export type SubmitStat = {
  */
 export type SubmitStatUpdater = <T extends keyof SubmitStat>(type: T, val: SubmitStat[T]) => void;
 /**
- * 图片上传方法定义
+ * 文件上传方法定义
  */
-export type ImgUploaderFunc = (
-	txt: string,
+export type FileUploaderFunc<T> = (
+	data: T,
 	statCb?: (stats: Record<string, SubmitStat>) => unknown,
+) => Promise<boolean>;
+/**
+ * 文件上传方法定义
+ */
+export type SimpleFileUploaderFunc<T> = (
+	statCb?: (stats: SubmitStat) => unknown,
+	data?: T,
 ) => Promise<boolean>;
 /**
  * 创建文件读取器

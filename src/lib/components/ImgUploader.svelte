@@ -5,10 +5,10 @@
 	import { dragstart } from '$helpers/drag-event';
 	import {
 		newFileReader,
-		type ImgUploaderFunc,
+		type FileUploaderFunc,
 		type SubmitStat,
 		type SubmitStatUpdater,
-	} from '$helpers/imgs';
+	} from '$helpers/files';
 
 	import { imgUrl, uploadImg } from '$lib/api/img';
 
@@ -33,7 +33,7 @@
 		/**远程uuid(图片真实uuid, 仅在上传后有效)*/
 		remoteUUID?: string;
 	};
-	const filedata: FileData[] = [];
+	let filedata: FileData[] = [];
 	const resetImgType = (files: FileList) => {
 		const rand = ((Math.random() * 36) | 0).toString(36);
 		const time = Date.now() * Math.pow(36, files.length.toString(36).length);
@@ -68,14 +68,17 @@
 	 * @param statCb 状态回调, 每次更新上传进度时调用
 	 * @returns 是否成功
 	 */
-	export const upload: ImgUploaderFunc = (txt, statCb?) =>
+	export const upload: FileUploaderFunc<string> = (txt, statCb) =>
 		new Promise<boolean>((resolve) => {
 			/**上传状态*/
 			const submitStat: Record<string, SubmitStat> = {};
 			statCb && statCb(submitStat);
 			const data = filedata
 				.filter((data) => !data.uploaded)
-				.filter((data) => txt.indexOf(data.localID) >= 0);
+				.filter(
+					(data) =>
+						(txt || '').indexOf(data.localID) >= 0 || Object.values(data.type).some((x) => x),
+				);
 			if (!(data.length > 0)) return resolve(true);
 			const tasks: task[] = data.map((data, i) => {
 				const file = data.file;
@@ -103,6 +106,7 @@
 									data.remoteUUID = r.uuid;
 									data.uploaded = true;
 								}
+								filedata = filedata; //update render
 								return {
 									success: r.success,
 									msg: r.success ? r.uuid : r.err,

@@ -60,7 +60,9 @@ export const listEssay = async (
 	page: number = 1,
 ): Promise<EssayList | null> => {
 	const resp = await f(
-		`${API_URL}/api/content/list-essay?catalogue=${catalogue}&category=${category}&page=${page}`,
+		`${API_URL}/api/content/list-essay?catalogue=${catalogue}&category=${category}&page=${
+			page - 1
+		}`,
 	);
 	if (!resp.ok) return null;
 	const data: EssayList = await resp.json();
@@ -160,6 +162,28 @@ export const listFile = async (f: FetchFunction, essay: number): Promise<FileLis
 };
 
 /**
+ * 上传文件
+ * @param f fetch
+ * @param file 文件
+ * @returns 上传结果
+ */
+export const uploadFile = async (
+	f: FetchFunction,
+	essay: number,
+	...files: File[]
+): Promise<UploadResp<string[]>> => {
+	if (isNaN(essay)) return { success: false, err: '无效 essay ID' };
+	const data = new FormData();
+	files.forEach((file) => data.append('file', file, file.name));
+	const resp = await f(`${API_URL}/api/content/upload-file?essay=${essay}`, {
+		method: 'POST',
+		body: data,
+	});
+	if (!resp.ok) return { success: false, err: `${resp.status} ${resp.statusText}` };
+	return await resp.json();
+};
+
+/**
  * 获取内容分类url
  * @param catalogue 大分类
  * @param category 小分类
@@ -177,6 +201,15 @@ export const contentUrl = (catalogue: string, category?: string, page?: number) 
  * @returns url
  */
 export const essayUrl = (essay: number) => `/essay/${essay}`;
+
+/**
+ * 获取文件url
+ * @param essay 内容ID
+ * @param file 文件UUID
+ * @returns url
+ */
+export const fileUrl = (essay: number, file: string) =>
+	`/api/content/file?essay=${essay}&file=${file}`;
 
 /** index排序 */
 const sortIndex = sortK('index');

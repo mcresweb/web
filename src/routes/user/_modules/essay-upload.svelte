@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { ImgUploaderFunc, SubmitStat } from '$helpers/imgs';
+	import type { FileUploaderFunc, SubmitStat } from '$helpers/files';
 	import { contentType, type Category, type EssayUpload } from '$defs/content';
-	import { essayUrl, listCatalogue, listCategory, uploadEssay } from '$lib/api/content';
+	import { essayUrl, listCatalogue, listCategory, uploadEssay, uploadFile } from '$lib/api/content';
 	import { browser, dev } from '$app/env';
 	import { marked } from 'marked';
 	import { bbcode, supportTags } from '$helpers/bbcode';
@@ -11,6 +11,8 @@
 	import { allowDrop, drop } from '$helpers/drag-event';
 	import Progress from '$components/Progress.svelte';
 	import type { ImgUsing } from '$defs/img';
+	import FileUploader from '$components/FileUploader.svelte';
+	import { blur } from 'svelte/transition';
 
 	export let isExpand: boolean = true;
 	const expand = () => (isExpand = true);
@@ -68,33 +70,54 @@
 	};
 	/**上传状态*/
 	let uploading: boolean;
-	let uploadImgFunc: ImgUploaderFunc | undefined;
-	let uploadImgStatus: Record<string, SubmitStat>;
+	let uploadImgFunc: FileUploaderFunc<string> | undefined;
+	let uploadStatus: Record<string, SubmitStat>;
 	let getImgs: () => Record<string, ImgUsing>;
+	let uploadFileFunc: FileUploaderFunc<number> | undefined;
+
 	const upload = async () => {
-		uploadImgStatus = {};
+		uploadStatus = {};
 		uploading = true;
 		try {
+			//上传图片
 			if (
 				!(await uploadImgFunc!(raw.content, (stat) => {
-					uploadImgStatus = stat;
+					uploadStatus = stat;
 				}))
 			) {
 				showErr = [
 					'上传图片失败: ',
-					...Object.values(uploadImgStatus).map(
+					...Object.values(uploadStatus).map(
 						(x) => `<p>${x.name}<br>${(x.now || 0) < 0 ? x.msg : '成功'}</p>`,
 					),
 				].join('<br>');
 				errDialogOpen = true;
 				return;
 			}
+			//翻译正文
 			raw.content = transText(raw.content);
+			//设置图片
 			raw.imgs = getImgs();
+			//上传内容
 			const resp = await uploadEssay(fetch, raw);
-			// confirmDialogOpen = false;
-			if (resp.success) goto(essayUrl(resp.id));
-			else (showErr = resp.err), (errDialogOpen = true);
+			if (!resp.success) {
+				showErr = resp.err;
+				errDialogOpen = true;
+				return;
+			}
+			//上传文件
+			if (await uploadFileFunc!(resp.id, (stat) => (uploadStatus = stat))) {
+				showErr = [
+					'上传文件失败: ',
+					...Object.values(uploadStatus).map(
+						(x) => `<p>${x.name}<br>${(x.now || 0) < 0 ? x.msg : '成功'}</p>`,
+					),
+				].join('<br>');
+				errDialogOpen = true;
+				return;
+			}
+			//跳转
+			goto(essayUrl(resp.id));
 		} finally {
 			uploading = false;
 			confirmDialogOpen = 0;
@@ -226,6 +249,7 @@
 			{/if}
 		</label>
 		<ImgUploader bind:transText bind:upload={uploadImgFunc} bind:getImgs />
+		<FileUploader bind:upload={uploadFileFunc} />
 		<label for="tags">
 			标签
 			<div id="tags" class="grid">
@@ -259,22 +283,31 @@
 		{#if uploading}
 			<h2>上传中</h2>
 
-			{#if uploadImgStatus}
+			{#if uploadStatus}
 				<table>
-					{#each Object.keys(uploadImgStatus) as k (k)}
-						{@const stat = uploadImgStatus[k]}
-						<tr> <td>{stat.name}</td></tr>
-						<tr>
-							<td>
-								<Progress
-									value={(stat.now || 0) < 0 ? stat.tot || 1 : stat.now}
-									max={stat.tot || 1}
-									txt={stat.msg}
-									color={(stat.now || 0) < 0 ? '#d9534f' : stat.over ? '#5cb85c' : '#5bc0de'}
-									floatTxt
-								/>
-							</td>
-						</tr>
+					{#each Object.keys(uploadStatus) as k (k)}
+						{#if !uploadStatus[k].over || (uploadStatus[k].now || 0) < 0}
+							<tr out:blur={{ delay: 1500 }}>
+								<td>{uploadStatus[k].name}</td>
+							</tr>
+							<tr out:blur={{ delay: 1500 }}>
+								<td>
+									<Progress
+										value={(uploadStatus[k].now || 0) < 0
+											? uploadStatus[k].tot || 1
+											: uploadStatus[k].now}
+										max={uploadStatus[k].tot || 1}
+										txt={uploadStatus[k].msg}
+										color={(uploadStatus[k].now || 0) < 0
+											? '#d9534f'
+											: uploadStatus[k].over
+											? '#5cb85c'
+											: '#5bc0de'}
+										floatTxt
+									/>
+								</td>
+							</tr>
+						{/if}
 					{/each}
 				</table>
 			{:else}

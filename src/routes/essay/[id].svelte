@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-	import { contentUrl, getEssay, getRandomEssay, listFile } from '$lib/api/content';
+	import { contentUrl, fileUrl, getEssay, getRandomEssay, listFile } from '$lib/api/content';
 	import type { Load } from '@sveltejs/kit';
 
 	const random = 'random';
@@ -177,9 +177,11 @@
 										</span>
 									</td>
 									<td class="icon">
-										<span data-tooltip="点击下载此文件">
-											<Icon icon="24px" size={1.8} />
-										</span>
+										<a href={fileUrl(essay.id, file.id)} target="_blank">
+											<span data-tooltip="点击下载此文件">
+												<Icon icon="24px" size={1.8} />
+											</span>
+										</a>
 									</td>
 								</tr>
 								<Dialog bind:open={stat[file.id].sha1}>
@@ -195,7 +197,7 @@
 						</tbody>
 						<tfoot>
 							<tr>
-								<td>共计 {info.amount} 个文件</td>
+								<td>共计 {info.files.length} 个文件</td>
 							</tr>
 						</tfoot>
 					</table>
