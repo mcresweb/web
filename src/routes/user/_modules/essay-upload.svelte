@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { FileUploaderFunc, SubmitStat } from '$helpers/files';
 	import { contentType, type Category, type EssayUpload } from '$defs/content';
-	import { essayUrl, listCatalogue, listCategory, uploadEssay, uploadFile } from '$lib/api/content';
+	import { essayUrl, listCatalogue, listCategory, uploadEssay } from '$lib/api/content';
 	import { browser, dev } from '$app/env';
 	import { marked } from 'marked';
 	import { bbcode, supportTags } from '$helpers/bbcode';

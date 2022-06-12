@@ -1,86 +1,86 @@
 {
-  "id": "3388568",
-  "name": "mcresweb",
-  "font_family": "iconfont",
-  "css_prefix_text": "icon-",
-  "description": "",
-  "glyphs": [
-    {
-      "icon_id": "5387522",
-      "name": "关闭",
-      "font_class": "guanbi",
-      "unicode": "eaf2",
-      "unicode_decimal": 60146
-    },
-    {
-      "icon_id": "1393648",
-      "name": "编辑器 · 全屏",
-      "font_class": "expand",
-      "unicode": "e6ed",
-      "unicode_decimal": 59117
-    },
-    {
-      "icon_id": "4924414",
-      "name": "校验",
-      "font_class": "xiaoyan",
-      "unicode": "e690",
-      "unicode_decimal": 59024
-    },
-    {
-      "icon_id": "15053390",
-      "name": "下载",
-      "font_class": "24px",
-      "unicode": "e604",
-      "unicode_decimal": 58884
-    },
-    {
-      "icon_id": "826165",
-      "name": "下载",
-      "font_class": "xiazai",
-      "unicode": "e63a",
-      "unicode_decimal": 58938
-    },
-    {
-      "icon_id": "649313",
-      "name": "左",
-      "font_class": "zuo",
-      "unicode": "e635",
-      "unicode_decimal": 58933
-    },
-    {
-      "icon_id": "649314",
-      "name": "右",
-      "font_class": "you",
-      "unicode": "e636",
-      "unicode_decimal": 58934
-    },
-    {
-      "icon_id": "2161",
-      "name": "收藏夹",
-      "font_class": "shoucangjia",
-      "unicode": "e600",
-      "unicode_decimal": 58880
-    },
-    {
-      "icon_id": "400020",
-      "name": "主页",
-      "font_class": "htmal5icon06",
-      "unicode": "e622",
-      "unicode_decimal": 58914
-    },
-    {
-      "icon_id": "677608",
-      "name": "用户",
-      "font_class": "yonghu",
-      "unicode": "e639",
-      "unicode_decimal": 58937
-    },
-    {
-      "icon_id": "26048165",
-      "name": "资源",
-      "font_class": "ziyuan",
-      "unicode": "e62b",
-      "unicode_decimal": 58923
-    }
-  ]
+	"id": "3388568",
+	"name": "mcresweb",
+	"font_family": "iconfont",
+	"css_prefix_text": "icon-",
+	"description": "",
+	"glyphs": [
+		{
+			"icon_id": "5387522",
+			"name": "关闭",
+			"font_class": "guanbi",
+			"unicode": "eaf2",
+			"unicode_decimal": 60146
+		},
+		{
+			"icon_id": "1393648",
+			"name": "编辑器 · 全屏",
+			"font_class": "expand",
+			"unicode": "e6ed",
+			"unicode_decimal": 59117
+		},
+		{
+			"icon_id": "4924414",
+			"name": "校验",
+			"font_class": "xiaoyan",
+			"unicode": "e690",
+			"unicode_decimal": 59024
+		},
+		{
+			"icon_id": "15053390",
+			"name": "下载",
+			"font_class": "24px",
+			"unicode": "e604",
+			"unicode_decimal": 58884
+		},
+		{
+			"icon_id": "826165",
+			"name": "下载",
+			"font_class": "xiazai",
+			"unicode": "e63a",
+			"unicode_decimal": 58938
+		},
+		{
+			"icon_id": "649313",
+			"name": "左",
+			"font_class": "zuo",
+			"unicode": "e635",
+			"unicode_decimal": 58933
+		},
+		{
+			"icon_id": "649314",
+			"name": "右",
+			"font_class": "you",
+			"unicode": "e636",
+			"unicode_decimal": 58934
+		},
+		{
+			"icon_id": "2161",
+			"name": "收藏夹",
+			"font_class": "shoucangjia",
+			"unicode": "e600",
+			"unicode_decimal": 58880
+		},
+		{
+			"icon_id": "400020",
+			"name": "主页",
+			"font_class": "htmal5icon06",
+			"unicode": "e622",
+			"unicode_decimal": 58914
+		},
+		{
+			"icon_id": "677608",
+			"name": "用户",
+			"font_class": "yonghu",
+			"unicode": "e639",
+			"unicode_decimal": 58937
+		},
+		{
+			"icon_id": "26048165",
+			"name": "资源",
+			"font_class": "ziyuan",
+			"unicode": "e62b",
+			"unicode_decimal": 58923
+		}
+	]
 }
