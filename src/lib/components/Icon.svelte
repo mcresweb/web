@@ -6,7 +6,7 @@
 	export { className as class };
 	export let id: string | undefined = undefined;
 	export let style: string | undefined = undefined;
-	export let size = 1;
+	export let size: number | null = 1;
 	/** 图标名称*/
 	export let icon: Icons | undefined;
 	$: href = `${IconPrefix}${icon}`;
@@ -15,7 +15,7 @@
 {#if icon}
 	<svg
 		{id}
-		style="font-size:{size}em;{style || ''}"
+		style="{typeof size != 'number' ? '' : `font-size:${size}em;`}{style || ''}"
 		class="icon {className}"
 		aria-hidden="true"
 		on:click

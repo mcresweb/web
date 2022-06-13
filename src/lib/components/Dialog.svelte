@@ -6,6 +6,9 @@
 	const closingClass = 'modal-is-closing';
 	const animationDuration = 400; // ms
 
+	/**指定是否需要最小区域(50%*50%)撑开内容*/
+	export let minHeight = false;
+
 	/**
 	 * 是否打开
 	 *
@@ -68,7 +71,7 @@
 </script>
 
 <dialog bind:this={me} open={!!open} on:click={click}>
-	<article>
+	<article class:minHeight>
 		<span style:cursor="opinter" aria-label="Close" class="close" on:click={() => (open = false)} />
 		<slot />
 	</article>
@@ -76,7 +79,10 @@
 
 <style>
 	article {
+		position: relative;
 		min-width: 50vw;
+	}
+	article.minHeight {
 		min-height: 50vh;
 	}
 </style>

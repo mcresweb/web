@@ -11,6 +11,9 @@
 	} from '$helpers/files';
 
 	import { imgUrl, uploadImg } from '$lib/api/img';
+	import { onDestroy } from 'svelte';
+	import { cubicIn } from 'svelte/easing';
+	import { blur } from 'svelte/transition';
 
 	/** 图片文件列表 */
 	let filesIn: FileList | null = null;
@@ -142,6 +145,21 @@
 		);
 		return text;
 	};
+
+	/**
+	 * 释放资源
+	 * @param data 数据
+	 */
+	const revoke = (data: FileData[]) =>
+		data.map((d) => d.localUrl).forEach((url) => URL.revokeObjectURL(url));
+	onDestroy(() => {
+		const data = [...filedata];
+		filedata = [];
+		revoke(data);
+	});
+
+	/** 使用的文字, 用于检测图片是否被使用 */
+	export let txt: string;
 </script>
 
 <label>
@@ -151,9 +169,18 @@
 
 {#if !(filedata.length < 1)}
 	<div class="img-view row">
-		{#each filedata as data, i (i)}
-			<div class="col-12 col-md-6 col-lg-3">
+		{#each filedata as data, i (data.localID)}
+			<div class="col-12 col-md-6 col-lg-3" out:blur={{ easing: cubicIn }}>
 				<fieldset>
+					<span
+						class="close"
+						class:disabled={(txt || '').indexOf(data.localID) >= 0}
+						on:click={() => {
+							const data = [...filedata];
+							revoke(data.splice(i, 1));
+							filedata = data;
+						}}
+					/>
 					{#each imgUsingKeys as type}
 						<label for="img_{i}_{type}_switch">
 							<input
@@ -226,11 +253,36 @@
 		border-bottom-left-radius: var(--border-radius);
 		border-bottom-right-radius: var(--border-radius);
 	}
+	.img-view fieldset {
+		position: relative;
+	}
 	.describe {
 		display: block;
 		width: 100%;
 		margin-top: 0;
 		margin-bottom: var(--spacing);
 		color: var(--muted-color);
+	}
+
+	.close {
+		cursor: pointer;
+		display: block;
+		width: 1rem;
+		height: 1rem;
+		position: absolute;
+		right: 1rem;
+		background-image: var(--icon-close);
+		background-position: center;
+		background-size: auto 1rem;
+		background-repeat: no-repeat;
+		opacity: 0.5;
+		transition: opacity var(--transition);
+	}
+	.close.disabled {
+		cursor: default;
+		opacity: 0.3;
+	}
+	.close:hover:not(.disabled) {
+		opacity: 1;
 	}
 </style>

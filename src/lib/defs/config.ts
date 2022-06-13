@@ -10,12 +10,30 @@ const confDefault = {
 	/** 网站标题 */
 	title: '我的世界资源网站',
 	API_URL: 'http://localhost',
+	keyword_platforms: {
+		example: {
+			name: '淘宝小店',
+			url: 'http://example.org/',
+			img: 'https://i1.sndcdn.com/avatars-000010282502-iygcnd-t500x500.jpg',
+			info: '一个样例平台, 可以在前端的config.yml中替换',
+		},
+	},
 };
 /**配置文件描述*/
 const confComment: Comment = {
 	__node_comment__: '前端配置文件',
 	title: '网站标题',
 	API_URL: '后端地址(仅由前端服务器使用, 可以指定反向代理/直接地址)',
+	keyword_platforms: {
+		__node_comment__: '会员码获取平台\n将会显示给用户供其获取\n如果为空, 则不会显示',
+		example: {
+			__node_comment__: '一个样例平台\n节点名不可重复、不可为"example"(为example将自动忽略)',
+			name: '平台名称',
+			url: '平台地址',
+			img: '展示图片',
+			info: '平台的描述信息',
+		},
+	},
 };
 /**配置文件*/
 export let config: Config;

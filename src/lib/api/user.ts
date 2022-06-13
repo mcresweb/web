@@ -8,6 +8,7 @@ import type {
 	SaltInfo,
 	SetVaptchaRequest,
 	UserInfo,
+	VipInfo,
 } from '$defs/user';
 
 /**
@@ -39,6 +40,17 @@ export const getInfo = async (f: FetchFunction, id: number): Promise<UserInfo | 
 export const getSalt = async (f: FetchFunction): Promise<SaltInfo> => {
 	const resp = await f(`${API_URL}/api/user/salt`);
 	if (!resp.ok) throw new Error();
+	return await resp.json();
+};
+
+/**
+ * 获取自身VIP信息
+ * @param f fetch
+ * @returns VIP信息
+ */
+export const getMyVip = async (f: FetchFunction): Promise<VipInfo | null> => {
+	const resp = await f(`${API_URL}/api/user/me-vip`);
+	if (!resp.ok) return null;
 	return await resp.json();
 };
 

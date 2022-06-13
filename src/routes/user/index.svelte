@@ -26,11 +26,13 @@
 	/** 菜单名称 */
 	const menus = {
 		basic: '用户信息',
+		keyword: '会员码',
 		...(user && user.admin
 			? {
 					catalogue: '大分类',
 					category: '小分类',
 					'essay-upload': '新建内容',
+					'keyword-manage': '会员码管理',
 					admin: '监控面板',
 					icons: '图标列表',
 					vaptcha: '验证码',

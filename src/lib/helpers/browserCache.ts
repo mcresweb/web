@@ -9,6 +9,7 @@ export const prefix = 'MCRESWEB_';
 export type types = {
 	listCatalogue: Catalogue[];
 	listCategory: Category[] | null;
+	tokenLen: number;
 };
 /** 缓存类型键 */
 export type names = keyof types;

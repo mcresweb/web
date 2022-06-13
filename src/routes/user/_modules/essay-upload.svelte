@@ -78,10 +78,11 @@
 	const upload = async () => {
 		uploadStatus = {};
 		uploading = true;
+		const data: EssayUpload = { ...raw };
 		try {
 			//上传图片
 			if (
-				!(await uploadImgFunc!(raw.content, (stat) => {
+				!(await uploadImgFunc!(data.content, (stat) => {
 					uploadStatus = stat;
 				}))
 			) {
@@ -95,11 +96,11 @@
 				return;
 			}
 			//翻译正文
-			raw.content = transText(raw.content);
+			data.content = transText(data.content);
 			//设置图片
-			raw.imgs = getImgs();
+			data.imgs = getImgs();
 			//上传内容
-			const resp = await uploadEssay(fetch, raw);
+			const resp = await uploadEssay(fetch, data);
 			if (!resp.success) {
 				showErr = resp.err;
 				errDialogOpen = true;
@@ -248,7 +249,7 @@
 				</small>
 			{/if}
 		</label>
-		<ImgUploader bind:transText bind:upload={uploadImgFunc} bind:getImgs />
+		<ImgUploader bind:transText bind:upload={uploadImgFunc} bind:getImgs bind:txt={raw.content} />
 		<FileUploader bind:upload={uploadFileFunc} />
 		<label for="tags">
 			标签

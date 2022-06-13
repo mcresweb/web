@@ -25,6 +25,15 @@ export type UserInfo = {
 	/** 是否是VIP */ vip: boolean;
 	/** 是否被锁定 */ lock: boolean;
 };
+
+/**
+ * Vip信息
+ */
+export type VipInfo = {
+	vipName: string;
+	expire: number | null;
+};
+
 /**
  * 服务器登录信息
  */
