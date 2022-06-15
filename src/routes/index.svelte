@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { BasicInfo } from '$defs/info';
+	import { BasicInfoNames } from '$defs/info';
 	import { basic } from '$lib/api/info';
 	import anime from 'animejs';
 	import { fly } from 'svelte/transition';
@@ -7,13 +7,8 @@
 	import { delay } from '$helpers/delay';
 	import { contentUrl, listCatalogue, listCategory } from '$lib/api/content';
 	import { session } from '$app/stores';
+	import { browser } from '$app/env';
 
-	const names: Record<keyof BasicInfo, string> = {
-		catalogue: '分类数量',
-		essay: '内容数量',
-		user: '用户数量',
-		day: '建站天数',
-	};
 	const eles: HTMLElement[] = [];
 	const keys = <T extends string>(obj: Record<T, any>) => Object.keys(obj) as T[];
 	const animeData = (ele: HTMLElement) => {
@@ -24,11 +19,32 @@
 	$: if (eles) eles.forEach(animeData);
 
 	const flyData = { y: 20, duration: 800, easing: quintOut };
+
+	const basicPromise =
+		browser &&
+		basic(fetch).then((x) => {
+			basicInfo = x;
+			return x;
+		});
+	let basicInfo: any;
+	$: needInit = basicInfo?.init;
 </script>
 
 <svelte:head><title>{$session.title}</title></svelte:head>
 
-{#await delay() then _}
+{#if needInit}
+	<div class="container">
+		<article>
+			<div class="headings">
+				<h1>嘿!</h1>
+				<h2>看来你刚部署好你的服务器, 现在让我们来初始化服务器吧!</h2>
+			</div>
+			<a href="/user/login?init#register" role="button">初始化服务器!</a>
+		</article>
+	</div>
+{/if}
+
+{#await delay() then}
 	<div id="head" class="container" in:fly={{ ...flyData, y: 100 }}>
 		<article class="row">
 			<div id="welcome" class="headings col-lg-8 ">
@@ -42,7 +58,7 @@
 					优质资源的服务平台。
 				</h2>
 			</div>
-			{#await basic(fetch)}
+			{#await basicPromise}
 				<article aria-busy="true" class="col-lg-4" />
 			{:then data}
 				<article class="col-lg-4" in:fly={flyData}>
@@ -51,9 +67,9 @@
 							<tr><th scope="col" colspan="2">平台信息</th></tr>
 						</thead>
 						<tbody>
-							{#each keys(data) as k, i}
+							{#each keys(BasicInfoNames) as k, i}
 								<tr>
-									<td>{names[k]}: </td>
+									<td>{BasicInfoNames[k]}: </td>
 									<td>
 										<strong bind:this={eles[i]} data-value={data[k]} />
 									</td>
@@ -61,6 +77,10 @@
 							{/each}
 						</tbody>
 					</table>
+				</article>
+			{:catch err}
+				<article class="col-lg-4" in:fly={flyData}>
+					{err}
 				</article>
 			{/await}
 		</article>

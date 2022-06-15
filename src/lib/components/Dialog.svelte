@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { browser } from '$app/env';
+
 	import { onDestroy } from 'svelte';
 
 	const isOpenClass = 'modal-is-open';
@@ -29,7 +31,7 @@
 
 	// Close modal
 	const closeModal = (animation: boolean) => {
-		if (!animation) {
+		if (!animation || !browser) {
 			open0 = open = false;
 			return;
 		}
@@ -43,7 +45,7 @@
 	};
 	// Open modal
 	const openModal = (animation: boolean) => {
-		if (!animation) {
+		if (!animation || !browser) {
 			open0 = open = true;
 			return;
 		}
@@ -64,7 +66,7 @@
 
 	onDestroy(() => {
 		open0 = open = false;
-		document.documentElement.classList.remove(closingClass, isOpenClass, openingClass);
+		if (browser) document.documentElement.classList.remove(closingClass, isOpenClass, openingClass);
 	});
 
 	let me: HTMLElement;

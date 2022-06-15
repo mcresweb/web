@@ -131,3 +131,36 @@ export const setVaptchaID = async (f: FetchFunction, data: SetVaptchaRequest): P
 		body: JSON.stringify(data),
 	});
 };
+
+/**
+ * 生成初始化服务器的临时验证码
+ * @param f fetch
+ * @returns 生成路径
+ */
+export const summonInitCode = async (f: FetchFunction): Promise<string> => {
+	const resp = await f(`${API_URL}/api/user/register-admin`);
+	return await resp.text();
+};
+
+/**
+ * 注册管理员
+ * @param f fetch
+ * @param code 初始化服务器的临时验证码
+ * @param data 注册数据
+ */
+export const doAdminRegister = async (
+	f: FetchFunction,
+	code: string,
+	data: RegisterRequest,
+): Promise<RegisterResp> => {
+	const resp = await f(`${API_URL}/api/user/register-admin`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'admin-code': code,
+		},
+		body: JSON.stringify(data),
+	});
+	if (resp.ok) return resp.json();
+	return { success: false, err: resp.statusText };
+};

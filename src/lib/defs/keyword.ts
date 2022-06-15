@@ -43,7 +43,7 @@ export class SearchReq {
 	 *
 	 * 0或未指定代表全部, 1代表已使用, 2代表未使用
 	 */
-	type: 0 | 1 | 2 = 0;
+	used?: boolean;
 	/**生成者ID / 用户名 / 邮箱*/
 	summoner?: number | string;
 	/**使用者ID / 用户名 / 邮箱*/

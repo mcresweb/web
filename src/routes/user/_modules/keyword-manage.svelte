@@ -53,7 +53,7 @@
 
 	/**搜索用数据*/
 	const searchData: SearchReq = new SearchReq();
-	$: if (searchData.useTime && searchData.type != 1) searchData.type = 1;
+	$: if (searchData.useTime && searchData.used !== true) searchData.used = true;
 	const searchResult: {
 		/**搜索结果*/
 		result?: SearchResp;
@@ -200,24 +200,24 @@
 			<label>
 				<input
 					type="radio"
-					value={0}
+					value={undefined}
 					disabled={!!searchData.useTime}
 					checked
-					bind:group={searchData.type}
+					bind:group={searchData.used}
 				/>
 				全部
 			</label>
 			<label>
-				<input type="radio" value={1} checked bind:group={searchData.type} />
+				<input type="radio" value={true} checked bind:group={searchData.used} />
 				已使用
 			</label>
 			<label>
 				<input
 					type="radio"
-					value={2}
+					value={false}
 					disabled={!!searchData.useTime}
 					checked
-					bind:group={searchData.type}
+					bind:group={searchData.used}
 				/>
 				未使用
 			</label>
@@ -228,7 +228,7 @@
 		<fieldset class="col-12">
 			<DatetimeRange bind:time={searchData.expireTime} label="过期时间区间" />
 		</fieldset>
-		{#if searchData.type != 2}
+		{#if searchData.used !== false}
 			<fieldset class="col-12">
 				<DatetimeRange bind:time={searchData.useTime} label="使用时间区间" />
 			</fieldset>

@@ -1,5 +1,12 @@
 <script context="module" lang="ts">
-	import { doLogin, doRegister, getMe, getSalt } from '$lib/api/user';
+	import {
+		doAdminRegister,
+		doLogin,
+		doRegister,
+		getMe,
+		getSalt,
+		summonInitCode,
+	} from '$lib/api/user';
 	import { register as getRegisterInfo } from '$lib/api/info';
 	import { browser } from '$app/env';
 	import type { Load } from '@sveltejs/kit';
@@ -27,6 +34,7 @@
 	import { goto } from '$app/navigation';
 	import type { LoginResp, RegisterResp } from '$defs/user';
 	import type { RegisterInfo } from '$defs/info';
+	import Dialog from '$components/Dialog.svelte';
 
 	export let regInfo: RegisterInfo;
 
@@ -37,7 +45,13 @@
 	let type: Type = types.indexOf(hash) < 0 ? 'login' : hash;
 	$: type = types.indexOf(hash) < 0 ? 'login' : hash;
 
-	if (browser && types.indexOf(location.hash as any) < 0) location.hash = types[0];
+	if (browser && types.indexOf(location.hash.substring(1) as any) < 0) location.hash = types[0];
+
+	/**是否是初始化页面*/
+	const isInit = $page.url.search === '?init';
+	/**初始化验证码请求面板打开状态*/
+	let openInitCodeResp = false;
+	let initCodePath: string;
 
 	/** 重置验证码 */
 	let reset: () => Promise<void>;
@@ -49,6 +63,7 @@
 	let email: string;
 	let emailCode: string;
 	let check_password: string;
+	let initCode: string;
 
 	/** 本地基础验证 */
 	let badData = false;
@@ -74,6 +89,14 @@
 			if (type === types[0]) {
 				const pwd = hashString(hashString(password, salt.salt), salt.time);
 				resp = await doLogin(fetch, { username, password: pwd, time: salt.time });
+			} else if (isInit) {
+				const pwd = hashString(password, salt.salt);
+				resp = await doAdminRegister(fetch, initCode, {
+					username,
+					password: pwd,
+					email,
+					code: emailCode,
+				});
 			} else {
 				const pwd = hashString(password, salt.salt);
 				resp = await doRegister(fetch, { username, password: pwd, email, code: emailCode });
@@ -126,8 +149,24 @@
 					<p>还没有账号? <a href="#{types[1]}">点我进行注册</a></p>
 					<p>忘记密码了? <a href="/user/forget-pwd">点我找回密码</a></p>
 				{:else}
-					<p>欢迎光临, 想要自由地探索 <i>{$session.title}</i> , 您首先需要注册一个账号。</p>
-					<p>已经有账号了? <a href="#{types[0]}">点我进行登录</a></p>
+					{#if isInit}
+						<p><b>想要初始化服务器, 你需要建立一个管理员账号</b></p>
+						<p>
+							注册管理员账号需要验证后端权限, 且只能在没有任何管理员存在时注册,
+							如果您不想注册管理员账户, 请 <span
+								role="link"
+								on:click={() => {
+									history.replaceState(null, '', $page.url.pathname);
+									location.reload();
+								}}>点我进行登录</span
+							>
+						</p>
+					{:else}
+						<p>欢迎光临, 想要自由地探索 <i>{$session.title}</i> , 您首先需要注册一个账号。</p>
+						<p>已经有账号了? <a href="#{types[0]}">点我进行登录</a></p>
+					{/if}
+
+					<br />
 					<p>
 						一些信息限制:
 						<br />
@@ -170,7 +209,7 @@
 							<input
 								type="text"
 								id="emailCode"
-								placeholder="请输入您的邮箱"
+								placeholder="请输入您的验证码"
 								autocomplete="email"
 								bind:value={emailCode}
 								aria-invalid={(emailCode && emailCode.length !== emailCodeLength) || undefined}
@@ -215,12 +254,47 @@
 						{error}
 					</span>
 				{/if}
+				{#if isInit}
+					<div class="row">
+						<label for="initCode" class="col-7">
+							后台权限验证码
+							<input
+								type="text"
+								id="initCode"
+								placeholder="请输入您的权限码"
+								bind:value={initCode}
+							/>
+						</label>
+						<label for="getInitCode" class="col-5">
+							获取验证码
+							<button
+								id="getInitCode"
+								on:click={async () => {
+									initCodePath = await summonInitCode(fetch);
+									openInitCodeResp = true;
+								}}
+							>
+								获取
+							</button>
+						</label>
+					</div>
+				{/if}
 				<button id="submit" on:click={validate} disabled={badData}>
-					{#if type === types[0]} 登录 {:else} 注册 {/if}
+					{#if type === types[0]} 登录 {:else if isInit} 注册管理员 {:else} 注册 {/if}
 				</button>
 			</span>
 		</FormPanel>
 	</article>
+
+	<Dialog bind:open={openInitCodeResp}>
+		<h1>后台权限验证码</h1>
+		<p>
+			此验证码用于验证你是否真的拥有后台权限, 我们在以下目录生成了一个包含验证码的文件, 请你打开它,
+			并将其输入到对应位置
+		</p>
+		<p>请注意：每次你点击"获取"按钮时都会生成一个新的验证码，请不要重复点击。</p>
+		<blockquote>{initCodePath}</blockquote>
+	</Dialog>
 
 	<Vaptcha bind:reset bind:validate pass={login} />
 </div>
