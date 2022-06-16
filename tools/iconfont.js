@@ -3,7 +3,7 @@
 
 import fs from 'fs';
 /** @type {{id:string;name:string;font_family:string;css_prefix_text:string;description:string;glyphs:readonly{icon_id:string;name:string;font_class:string;unicode:string;unicode_decimal:number;}[];}}*/
-const info = JSON.parse(fs.readFileSync('.\\assets\\iconfont.json', 'utf8'));
+const info = JSON.parse(fs.readFileSync('./assets/iconfont.json', 'utf8'));
 
 /** 前缀 */
 const prefix = JSON.stringify('#' + info.css_prefix_text);
