@@ -2,6 +2,7 @@
 	import { browser } from '$app/env';
 
 	import type { Category, ModCategoryRequest } from '$defs/content';
+	import { clearCache } from '$helpers/browserCache';
 	import { listCatalogue, listCategory, modCategory } from '$lib/api/content';
 
 	export let isExpand: boolean = false;
@@ -72,6 +73,7 @@
 			loading = true;
 			const resp = await modCategory(fetch, { catalogue, key: key });
 			if (!resp.success) alert(resp.err);
+			clearCache('listCategory', catalogue);
 			await getCategory();
 		},
 		mod: async (cate: Category | typeof adder) => {
@@ -86,6 +88,7 @@
 			};
 			const resp = await modCategory(fetch, data);
 			if (!resp.success) alert(resp.err);
+			clearCache('listCategory', catalogue);
 			await getCategory();
 		},
 	};

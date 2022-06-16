@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/env';
 	import type { Catalogue, ModCatalogueRequest } from '$defs/content';
+	import { clearCache } from '$helpers/browserCache';
 	import { listCatalogue, modCatalogue } from '$lib/api/content';
 
 	export let isExpand: boolean = false;
@@ -58,6 +59,7 @@
 			loading = true;
 			const resp = await modCatalogue(fetch, { key: key });
 			if (!resp.success) alert(resp.err);
+			clearCache('listCatalogue');
 			await getCatalogues();
 		},
 		mod: async (cata: Catalogue | typeof adder) => {
@@ -72,6 +74,7 @@
 			};
 			const resp = await modCatalogue(fetch, data);
 			if (!resp.success) alert(resp.err);
+			clearCache('listCatalogue');
 			await getCatalogues();
 		},
 	};

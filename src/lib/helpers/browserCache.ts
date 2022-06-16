@@ -60,3 +60,13 @@ export const setCache = <T extends names>(
 	else sessionStorage.removeItem(prefix + type + (sub || ''));
 	return data;
 };
+/**
+ * 移除缓存
+ * @param type 键
+ */
+export const clearCache = <T extends names>(
+	type: T,
+	sub: string | undefined | null = undefined,
+) => {
+	if (browser && sessionStorage) sessionStorage.removeItem(prefix + type + (sub || ''));
+};
