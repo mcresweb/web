@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { BasicInfoNames } from '$defs/info';
+	import { BasicInfoNames, type BasicInfo } from '$defs/info';
 	import { basic } from '$lib/api/info';
 	import anime from 'animejs';
 	import { fly } from 'svelte/transition';
@@ -20,12 +20,12 @@
 
 	const flyData = { y: 20, duration: 800, easing: quintOut };
 
-	const basicPromise =
-		browser &&
+	/**服务器基础信息*/
+	const basicPromise = (browser && //在服务器端由于delay()函数限制, 不会使用此变量, 所以false值在使用时永远不存在
 		basic(fetch).then((x) => {
 			basicInfo = x;
 			return x;
-		});
+		})) as Promise<BasicInfo>;
 	let basicInfo: any;
 	$: needInit = basicInfo?.init;
 </script>

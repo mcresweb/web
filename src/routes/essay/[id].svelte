@@ -8,10 +8,11 @@
 		let essay: Essay | null;
 		if (params.id === random) {
 			essay = await getRandomEssay(fetch);
+			if (!essay) return { status: 404, error: '还没有内容可以显示' };
 		} else {
 			essay = await getEssay(fetch, parseInt(params.id));
+			if (!essay) return { status: 404, error: `找不到ID为 ${params.id} 的内容` };
 		}
-		if (!essay) return { status: 404 };
 		return {
 			props: { essay },
 		};
@@ -225,14 +226,14 @@
 	</article>
 </div>
 
-<div class="container">
-	<article>
-		<h1>调试数据</h1>
-		{#if dev}
+{#if dev}
+	<div class="container">
+		<article>
+			<h1>调试数据</h1>
 			<pre>{JSON.stringify(essay, null, 4)}</pre>
-		{/if}
-	</article>
-</div>
+		</article>
+	</div>
+{/if}
 
 <style>
 	#tags {

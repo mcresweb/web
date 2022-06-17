@@ -19,7 +19,7 @@
 
 	.left {
 		height: calc(100% - 40px);
-		background-color: #fff;
+		background-color: var(--card-background-color);
 		position: relative;
 		/* top: 20px; */
 		padding-bottom: 50px;
