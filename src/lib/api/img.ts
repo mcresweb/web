@@ -23,6 +23,6 @@ export const uploadImg = async (
 		},
 		body: data,
 	});
-	if (!resp.ok) return { success: false, err: `${resp.status} - ${resp.statusText}` };
+	if (!resp.ok) return { success: false, err: `${resp.status} - ${await resp.text()}` };
 	return await resp.json();
 };

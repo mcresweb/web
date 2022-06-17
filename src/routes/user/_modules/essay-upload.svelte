@@ -107,7 +107,7 @@
 				return;
 			}
 			//上传文件
-			if (await uploadFileFunc!(resp.id, (stat) => (uploadStatus = stat))) {
+			if (!(await uploadFileFunc!(resp.id, (stat) => (uploadStatus = stat)))) {
 				showErr = [
 					'上传文件失败: ',
 					...Object.values(uploadStatus).map(

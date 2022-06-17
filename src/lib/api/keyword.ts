@@ -15,7 +15,7 @@ export const useToken = async (f: FetchFunction, token: string): Promise<UseResp
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify(data),
 	});
-	if (!resp.ok) return { success: false, err: `${resp.status} ${resp.statusText}` };
+	if (!resp.ok) return { success: false, err: `${resp.status} - ${await resp.text()}` };
 	return await resp.json();
 };
 

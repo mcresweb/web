@@ -151,7 +151,7 @@
 				<span aria-busy="true" />
 			{:then info}
 				{#if !info || typeof info === 'string'}
-					<span>{info}</span>
+					无法获取资源: <span>{info}</span>
 				{:else if setInfo(info)}
 					<table role="grid" id="res_list">
 						<thead>

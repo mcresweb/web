@@ -68,7 +68,7 @@ export const doLogin = async (f: FetchFunction, data: LoginRequest): Promise<Log
 		body: JSON.stringify(data),
 	});
 	if (resp.ok) return resp.json();
-	return { success: false, err: resp.statusText || resp.status.toString() };
+	return { success: false, err: `${resp.status} - ${await resp.text()}` };
 };
 
 /**
@@ -88,7 +88,7 @@ export const doRegister = async (
 		body: JSON.stringify(data),
 	});
 	if (resp.ok) return resp.json();
-	return { success: false, err: resp.statusText };
+	return { success: false, err: `${resp.status} - ${await resp.text()}` };
 };
 
 /**
@@ -162,5 +162,5 @@ export const doAdminRegister = async (
 		body: JSON.stringify(data),
 	});
 	if (resp.ok) return resp.json();
-	return { success: false, err: resp.statusText };
+	return { success: false, err: `${resp.status} - ${await resp.text()}` };
 };

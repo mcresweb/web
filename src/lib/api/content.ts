@@ -155,7 +155,7 @@ export const uploadEssay = async (
 export const listFile = async (f: FetchFunction, essay: number): Promise<FileList | string> => {
 	if (isNaN(essay)) return '无效essay ID';
 	const resp = await f(`${API_URL}/api/content/list-file?essay=${essay}`);
-	if (!resp.ok) return resp.statusText;
+	if (!resp.ok) return `${resp.status} - ${await resp.text()}`;
 	const info: FileList | { success: false; err: string } = await resp.json();
 	if (!info.success) return info.err;
 	return info;
@@ -164,7 +164,8 @@ export const listFile = async (f: FetchFunction, essay: number): Promise<FileLis
 /**
  * 上传文件
  * @param f fetch
- * @param file 文件
+ * @param essay 内容ID
+ * @param files 文件
  * @returns 上传结果
  */
 export const uploadFile = async (
@@ -179,7 +180,7 @@ export const uploadFile = async (
 		method: 'POST',
 		body: data,
 	});
-	if (!resp.ok) return { success: false, err: `${resp.status} ${resp.statusText}` };
+	if (!resp.ok) return { success: false, err: `${resp.status} - ${await resp.text()}` };
 	return await resp.json();
 };
 
