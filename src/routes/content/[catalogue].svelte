@@ -29,8 +29,8 @@
 	let cateKey: string;
 	/** 小分类 */
 	let cate: Category | undefined;
-	/** 当前大分类下的所有小分类 */
-	let allCate: Record<string, Category> | null;
+	/** 当前大分类下的所有小分类 (undefined: 未获取) */
+	let allCate: Record<string, Category> | null | undefined = undefined;
 
 	$: cataKey = $page.params.catalogue;
 	$: cata = catalogue[cataKey];
@@ -86,6 +86,8 @@
 		</article>
 
 		<EssayList catalogue={cata} category={cate} />
+	{:else if allCate === undefined}
+		<article class="container" aria-busy="true">加载中... 请稍后</article>
 	{:else if cata}
 		<article class="container headings">
 			<h1 class="error">啊哦, 找不到此子分类</h1>
