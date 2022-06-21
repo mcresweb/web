@@ -27,6 +27,21 @@ export const listCatalogue = async (f: FetchFunction): Promise<Catalogue[]> => {
 	});
 	return data.sort(sortIndex);
 };
+
+/**
+ * 通过key寻找大分类
+ * @param f fetch
+ * @param catalogue 大分类的key
+ * @returns 大分类 / 找不到大分类
+ * @throws Error 接口访问不成功
+ */
+export const getCatalogueByKey = async (
+	f: FetchFunction,
+	catalogue: string,
+): Promise<Catalogue | undefined> => {
+	const catas = await listCatalogue(f);
+	return catas.find((x) => x.key == catalogue);
+};
 /**
  * 列出小分类
  * @param f fetch
@@ -43,6 +58,22 @@ export const listCategory = async (
 		return await resp.json();
 	});
 	return data && data.sort(sortIndex);
+};
+
+/**
+ * 通过key寻找小分类
+ * @param f fetch
+ * @param catalogue 小分类的key
+ * @param category 小分类的key
+ * @returns 小分类 / 找不到小分类
+ */
+export const getCategoryByKey = async (
+	f: FetchFunction,
+	catalogue: string,
+	category: string,
+): Promise<Category | undefined> => {
+	const cates = await listCategory(f, catalogue);
+	return (cates && cates.find((x) => x.key == category)) || undefined;
 };
 
 /**

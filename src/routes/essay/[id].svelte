@@ -1,5 +1,13 @@
 <script context="module" lang="ts">
-	import { contentUrl, fileUrl, getEssay, getRandomEssay, listFile } from '$lib/api/content';
+	import {
+		contentUrl,
+		fileUrl,
+		getCatalogueByKey,
+		getCategoryByKey,
+		getEssay,
+		getRandomEssay,
+		listFile,
+	} from '$lib/api/content';
 	import type { Load } from '@sveltejs/kit';
 
 	const random = 'random';
@@ -35,6 +43,7 @@
 	import Icon from '$components/Icon.svelte';
 	import Dialog from '$components/Dialog.svelte';
 	import { bbcode } from '$helpers/bbcode';
+	import { delay } from '$helpers/delay';
 
 	export let essay: Essay;
 	if (browser && $page.params.id == random) history.replaceState(null, '', './' + essay.id);
@@ -68,8 +77,25 @@
 						<h1 class="hidden-sm">{essay.title}</h1>
 						<h3 class="visible-sm">{essay.title}</h3>
 						<h2>
-							<a href={contentUrl(essay.catalogue)}>{essay.catalogue}</a> &gt;
-							<a href={contentUrl(essay.catalogue, essay.category)}>{essay.category}</a>
+							{#await delay()}
+								{essay.catalogue} &gt; {essay.category}
+							{:then}
+								<a href={contentUrl(essay.catalogue)}>
+									{#await getCatalogueByKey(fetch, essay.catalogue)}
+										{essay.catalogue}
+									{:then catalogue}
+										{catalogue?.title || essay.catalogue}
+									{/await}
+								</a>
+								&gt;
+								<a href={contentUrl(essay.catalogue, essay.category)}>
+									{#await getCategoryByKey(fetch, essay.catalogue, essay.category)}
+										{essay.category}
+									{:then category}
+										{category?.title || essay.category}
+									{/await}
+								</a>
+							{/await}
 						</h2>
 					</div>
 				</li>
@@ -92,7 +118,7 @@
 					<li>暂无</li>
 				{/if}
 				{#if essay.starAmount !== undefined}
-					<li>({essay.starAmount} 次评价)</li>
+					<li class="hidden-sm">({essay.starAmount} 次评价)</li>
 				{/if}
 			</ul>
 			<ul>
