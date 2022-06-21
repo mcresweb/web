@@ -8,6 +8,7 @@ export type MeLoginInfo = {
 	/** 用户邮箱 */ email: string;
 	/** 是否是管理员 */ admin: boolean;
 	/** 是否是VIP */ vip: boolean;
+	/** VIP名称 */ vipName: string;
 	/** 是否被锁定 */ lock: boolean;
 };
 /**

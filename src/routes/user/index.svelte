@@ -59,6 +59,7 @@
 	const expand = () => {
 		isExpand = !isExpand;
 	};
+	let hiddenExpand = false;
 </script>
 
 <svelte:window on:hashchange={() => (menu = getMenu())} />
@@ -97,15 +98,17 @@
 							<li><h3>{menus[menu]}</h3></li>
 						</ul>
 						<ul class="hidden-lg-inline">
-							<li style:vertical-align="top" style:cursor="pointer" on:click={expand}>
-								<Icon icon="expand" />
-							</li>
+							{#if !hiddenExpand}
+								<li style:vertical-align="top" style:cursor="pointer" on:click={expand}>
+									<Icon icon="expand" />
+								</li>
+							{/if}
 						</ul>
 					</nav>
 					{#if browser && nowModule && modules && modules[nowModule]}
 						{#await modules[nowModule]() then m}
 							<span in:blur>
-								<svelte:component this={m.default} {user} bind:isExpand />
+								<svelte:component this={m.default} {user} bind:isExpand bind:hiddenExpand />
 							</span>
 						{/await}
 					{/if}
