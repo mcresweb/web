@@ -35,6 +35,8 @@
 	import type { LoginResp, RegisterResp } from '$defs/user';
 	import type { RegisterInfo } from '$defs/info';
 	import Dialog from '$components/Dialog.svelte';
+	import { xlink_attr } from 'svelte/internal';
+	import InputBase from '$components/InputBase.svelte';
 
 	export let regInfo: RegisterInfo;
 
@@ -65,19 +67,17 @@
 	let check_password: string;
 	let initCode: string;
 
+	$: updateInputCheck(username, 'account');
+	$: updateInputCheck(email, 'email');
+	$: updateInputCheck(emailCode, 'emailCode');
+	$: updateInputCheck(password, 'password');
+	$: updateInputCheck(check_password, 'checkPassword', password);
+	$: updateInputCheck(initCode, 'initCode');
+
 	/** 本地基础验证 */
 	let badData = false;
 	let error: string;
-	$: badData =
-		!(username && isPassword(password)) ||
-		(type === types[1] &&
-			!(
-				isUsername(username) &&
-				check_password === password &&
-				isEmail(email) &&
-				emailCode &&
-				emailCode.length === emailCodeLength
-			));
+	$: badData = Object.values(inputErrors).some((x) => x !== undefined) || !!error;
 
 	const login = async () => {
 		if (badData) return;
@@ -104,7 +104,6 @@
 			if (resp.success) return goto('./');
 			else {
 				error = resp.err;
-				badData = true;
 			}
 		} finally {
 			reset();
@@ -116,18 +115,87 @@
 		return `${(window as any).CryptoJS.SHA256(a + b)}`;
 	};
 
-	const isEmail = (str: string): boolean =>
-		str ? /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(str) : false;
-	const isUsername = (str: string): boolean => {
-		if (!str || str.length > regInfo.nameLen) return false; //不得过长
-		if (str.indexOf('@') >= 0) return false; //不得与邮箱重叠
-		if (/^[0-9]+$/.test(str)) return false; //不得与用户ID重叠
-		return true;
+	/**所有的输入字段*/
+	type inputFields = 'account' | 'email' | 'emailCode' | 'password' | 'checkPassword' | 'initCode';
+	/**输入字段的元素*/
+	const inputElements: { [k in inputFields]?: HTMLElement } = {};
+	/**输入字段的错误, null: 无输入, undefined: 无错误, string: 错误信息 */
+	const inputErrors: { [k in inputFields]?: string | null } = {};
+	/**输入限制*/
+	const inputLimit: {
+		[k in inputFields]?: {
+			/**判断输入是否为空(即不提示有效/无效, 也不进行后续判断)*/
+			empty?: (input: string) => boolean;
+			/**输入数据限制*/
+			limit: {
+				/**当无效时的提示信息*/
+				txt: string;
+				/**
+				 * 判断输入内容是否无效
+				 * @param input 输入内容
+				 * @returns is invalid
+				 */
+				func: (input: string) => boolean;
+			}[];
+		};
+	} = {
+		account: {
+			limit: [
+				{ txt: '名称过长', func: (str) => str.length > regInfo.nameLen },
+				{ txt: '不得含@符号', func: (str) => str.indexOf('@') >= 0 },
+				{ txt: '不得为纯数字', func: (str) => /^[0-9]+$/.test(str) },
+			],
+		},
+		email: {
+			limit: [
+				{
+					txt: '无效邮箱',
+					func: (str) => !/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(str),
+				},
+			],
+		},
+		emailCode: {
+			limit: [
+				{ txt: `非数字`, func: (str) => !/^[0-9]+$/.test(str) },
+				{ txt: `长度不足 ${emailCodeLength} 位`, func: (str) => str.length != emailCodeLength },
+			],
+		},
+		password: {
+			limit: [
+				{ txt: '密码过短', func: (str) => str.length < minPwdLen },
+				{
+					txt: '不得仅含 数字+小写字母 或 数字+大写字母 ',
+					func: (str) => /^[0-9a-z]+$/.test(str) || /^[0-9A-Z]+$/.test(str),
+				},
+			],
+		},
+		checkPassword: {
+			limit: [
+				{ txt: '两次密码不一致', func: (str) => str != password },
+				{ txt: '原密码有误', func: () => !!inputErrors.password },
+			],
+		},
 	};
-	const isPassword = (str: string): boolean => {
-		if (!str || str.length < minPwdLen) return false; //不可过短
-		if (/^[0-9]+$/.test(str) || /^[0-9A-Z]+$/.test(str)) return false; //不可简单密码
-		return true;
+	/**
+	 * 更新输入检查
+	 * @param input 输入内容
+	 * @param type 对应字段
+	 * @param _justListen 用于监听的字段
+	 */
+	const updateInputCheck = (input: string, type: inputFields, ..._justListen: any[]) => {
+		error = ''; //清除全局错误
+		const attr = 'aria-invalid';
+		const ele = inputElements[type];
+		if (!ele) return;
+		const limit = inputLimit[type];
+		if (!limit || (limit.empty ? limit.empty : (str: string) => !str)(input)) {
+			ele.removeAttribute(attr);
+			inputErrors[type] = null;
+		} else {
+			const bad = limit.limit.find((x) => x.func(input));
+			ele.setAttribute(attr, !!bad + '');
+			inputErrors[type] = bad?.txt;
+		}
 	};
 </script>
 
@@ -178,76 +246,73 @@
 				{/if}
 			</span>
 			<span slot="form">
-				<label for="account">
-					账号
-					<input
-						type="text"
-						id="account"
-						placeholder="用户名{type === types[0] ? ' / ID / 邮箱' : ''}"
-						autocomplete="username"
-						bind:value={username}
-						aria-invalid={username ? type !== types[0] && !isUsername(username) : undefined}
-					/>
-				</label>
+				<InputBase
+					label="账号"
+					id="account"
+					type="text"
+					placeholder="用户名{type === types[0] ? ' / ID / 邮箱' : ''}"
+					bind:value={username}
+					autocomplete="username"
+					bind:inputElement={inputElements.account}
+					error={inputErrors.account}
+				/>
 
 				{#if type === types[1]}
-					<label for="email">
-						邮箱
-						<input
-							type="email"
-							id="email"
-							placeholder="请输入您的邮箱"
-							autocomplete="email"
-							bind:value={email}
-							aria-invalid={email ? !isEmail(email) : undefined}
-						/>
-					</label>
+					<InputBase
+						label="邮箱"
+						id="email"
+						type="email"
+						placeholder="请输入您的邮箱"
+						bind:value={email}
+						autocomplete="email"
+						bind:inputElement={inputElements.email}
+						error={inputErrors.email}
+					/>
 
 					<div class="row">
-						<label for="emailCode" class="col-7">
-							邮箱验证码
-							<input
-								type="text"
-								id="emailCode"
-								placeholder="请输入您的验证码"
-								autocomplete="email"
-								bind:value={emailCode}
-								aria-invalid={(emailCode && emailCode.length !== emailCodeLength) || undefined}
-							/>
-						</label>
+						<InputBase
+							label="邮箱验证码"
+							labelClass="col-7"
+							id="emailCode"
+							type="text"
+							placeholder="请输入您的验证码"
+							bind:value={emailCode}
+							bind:inputElement={inputElements.emailCode}
+							error={inputErrors.emailCode}
+						/>
 						<label for="getEmailCode" class="col-5">
 							获取验证码
-							<button id="getEmailCode" disabled={!isEmail(email)} on:click={() => alert('?')}>
+							<button
+								id="getEmailCode"
+								disabled={inputErrors.email !== undefined}
+								on:click={() => alert('?')}
+							>
 								获取
 							</button>
 						</label>
 					</div>
 				{/if}
-				<label for="password">
-					密码
-					<input
-						type="password"
-						id="password"
-						placeholder="请输入您的密码"
-						autocomplete={type === types[1] ? 'new-password' : 'current-password'}
-						bind:value={password}
-						aria-invalid={password ? !isPassword(password) : undefined}
-					/>
-				</label>
+				<InputBase
+					label="密码"
+					type="password"
+					id="password"
+					placeholder="请输入您的密码"
+					bind:value={password}
+					autocomplete={type === types[1] ? 'new-password' : 'current-password'}
+					bind:inputElement={inputElements.password}
+					error={inputErrors.password}
+				/>
 				{#if type === types[1]}
-					<label for="check-password">
-						确认密码
-						<input
-							type="password"
-							id="check-password"
-							placeholder="请再次输入您的密码"
-							autocomplete="new-password"
-							bind:value={check_password}
-							aria-invalid={check_password
-								? check_password !== password || !isPassword(check_password)
-								: undefined}
-						/>
-					</label>
+					<InputBase
+						label="确认密码"
+						type="password"
+						id="check-password"
+						placeholder="请再次输入您的密码"
+						autocomplete="new-password"
+						bind:value={check_password}
+						bind:inputElement={inputElements.checkPassword}
+						error={inputErrors.checkPassword}
+					/>
 				{/if}
 				{#if error}
 					<span style:color="var(--bs-red)">
@@ -256,15 +321,16 @@
 				{/if}
 				{#if isInit}
 					<div class="row">
-						<label for="initCode" class="col-7">
-							后台权限验证码
-							<input
-								type="text"
-								id="initCode"
-								placeholder="请输入您的权限码"
-								bind:value={initCode}
-							/>
-						</label>
+						<InputBase
+							label="后台权限验证码"
+							labelClass="col-7"
+							id="initCode"
+							type="text"
+							placeholder="请输入您的权限码"
+							bind:value={initCode}
+							bind:inputElement={inputElements.initCode}
+							error={inputErrors.initCode}
+						/>
 						<label for="getInitCode" class="col-5">
 							获取验证码
 							<button
