@@ -5,7 +5,7 @@ import type { RequestHandler } from '@sveltejs/kit';
 export const get: RequestHandler = async (): ApiResp<UserInfo> => {
 	return {
 		body: {
-			id: 'b9d692a8348d639843f5c67c0ec03587', //用户UUID
+			id: 1, //用户ID
 			name: 'yuanlu', //用户名
 			admin: true, //是否是管理员
 			vip: true, //是否是VIP

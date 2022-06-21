@@ -6,7 +6,7 @@ export const get: RequestHandler = async (): ApiResp<MeInfo> => {
 	return {
 		body: {
 			login: true,
-			id: 'b9d692a8348d639843f5c67c0ec03587',
+			id: 1,
 			name: 'yuanlu',
 			email: 'yuanlu@yuanlu.bid',
 			admin: true,

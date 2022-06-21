@@ -13,12 +13,15 @@
 	let tokenLength = -1;
 	if (browser) tokenLen(fetch).then((len) => (tokenLength = len));
 
+	/**用户输入的会员码*/
 	let token: string;
 	$: badToken = !token || !/^[0-9a-z]+$/i.test(token) || token.length != tokenLength;
+	/**使用响应*/
 	let useResp: UseResp | undefined = undefined;
+	/**使用响应面板的打开状态*/
 	let openUseResp: boolean = false;
+	/**使用会员码*/
 	const useKeyword = async () => {
-		console.log('a ??');
 		useResp = await useToken(fetch, token);
 		openUseResp = true;
 	};
