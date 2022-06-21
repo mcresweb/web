@@ -35,7 +35,6 @@
 	import type { LoginResp, RegisterResp } from '$defs/user';
 	import type { RegisterInfo } from '$defs/info';
 	import Dialog from '$components/Dialog.svelte';
-	import { xlink_attr } from 'svelte/internal';
 	import InputBase from '$components/InputBase.svelte';
 
 	export let regInfo: RegisterInfo;
@@ -183,6 +182,7 @@
 	 * @param _justListen 用于监听的字段
 	 */
 	const updateInputCheck = (input: string, type: inputFields, ..._justListen: any[]) => {
+		_justListen;
 		error = ''; //清除全局错误
 		const attr = 'aria-invalid';
 		const ele = inputElements[type];
@@ -216,33 +216,21 @@
 					<p>欢迎光临, 请登录 <b>{$session.title}</b> , 登录后您将可以自由地探索整个网站.</p>
 					<p>还没有账号? <a href="#{types[1]}">点我进行注册</a></p>
 					<p>忘记密码了? <a href="/user/forget-pwd">点我找回密码</a></p>
-				{:else}
-					{#if isInit}
-						<p><b>想要初始化服务器, 你需要建立一个管理员账号</b></p>
-						<p>
-							注册管理员账号需要验证后端权限, 且只能在没有任何管理员存在时注册,
-							如果您不想注册管理员账户, 请 <span
-								role="link"
-								on:click={() => {
-									history.replaceState(null, '', $page.url.pathname);
-									location.reload();
-								}}>点我进行登录</span
-							>
-						</p>
-					{:else}
-						<p>欢迎光临, 想要自由地探索 <i>{$session.title}</i> , 您首先需要注册一个账号。</p>
-						<p>已经有账号了? <a href="#{types[0]}">点我进行登录</a></p>
-					{/if}
-
-					<br />
+				{:else if isInit}
+					<p><b>想要初始化服务器, 你需要建立一个管理员账号</b></p>
 					<p>
-						一些信息限制:
-						<br />
-						账号最大长度: {regInfo.nameLen}, 不得纯数字, 不得含@
-						<br />
-						密码最小长度: {minPwdLen}, 不得仅含数字+小写字符/数字+大写字符, 需要同时包含大小写 /
-						包含特殊字符等。
+						注册管理员账号需要验证后端权限, 且只能在没有任何管理员存在时注册,
+						如果您不想注册管理员账户, 请 <span
+							role="link"
+							on:click={() => {
+								history.replaceState(null, '', $page.url.pathname);
+								location.reload();
+							}}>点我进行登录</span
+						>
 					</p>
+				{:else}
+					<p>欢迎光临, 想要自由地探索 <i>{$session.title}</i> , 您首先需要注册一个账号。</p>
+					<p>已经有账号了? <a href="#{types[0]}">点我进行登录</a></p>
 				{/if}
 			</span>
 			<span slot="form">
