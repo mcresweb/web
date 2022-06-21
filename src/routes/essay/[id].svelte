@@ -148,13 +148,13 @@
 			<p>{essay.description}</p>
 		{/if}
 		<hr />
-		{#if essay.imgs}
+		{#if essay.imgs && essay.imgs.length > 0}
 			<Swiper
 				modules={[Pagination, Autoplay, Mousewheel]}
 				spaceBetween={50}
 				slidesPerView={1}
 				pagination={{ clickable: true }}
-				autoplay={true}
+				autoplay={essay.imgs.length > 1}
 				loop={true}
 			>
 				{#each essay.imgs as uuid}
