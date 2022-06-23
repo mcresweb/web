@@ -8,6 +8,8 @@
 	import { tokenLen, useToken } from '$lib/api/keyword';
 	import { getMyVip } from '$lib/api/user';
 
+	export const hiddenExpand = true;
+
 	export let user: MeLoginInfo;
 
 	let tokenLength = -1;

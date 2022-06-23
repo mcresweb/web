@@ -4,6 +4,8 @@
 
 	import { doLogout, loginUrl } from '$lib/api/user';
 
+	export const hiddenExpand = true;
+
 	/** 登出 */
 	const logout = async () => {
 		await doLogout(fetch);
