@@ -23,7 +23,7 @@ export type SearchDoc = {
 	doc: {
 		id: string;
 		title: string;
-		tags: string | string[];
+		tags?: string | string[];
 		content: string;
 		description: string;
 		senderID: string;

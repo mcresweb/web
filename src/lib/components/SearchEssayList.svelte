@@ -24,7 +24,7 @@
 								{@html doc.content}
 							{:else if typeof doc.tags === 'string' && hf(doc.tags)}
 								标签: {@html doc.tags}
-							{:else if typeof doc.tags !== 'string' && doc.tags.some(hf)}
+							{:else if Array.isArray(doc.tags) && doc.tags.some(hf)}
 								标签: {@html doc.tags.filter(hf)}
 							{:else}
 								{doc.content}
