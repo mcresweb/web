@@ -232,7 +232,7 @@ export const contentUrl = (catalogue: string, category?: string, page?: number) 
  * @param essay 内容ID
  * @returns url
  */
-export const essayUrl = (essay: number) => `/essay/${essay}`;
+export const essayUrl = (essay: number | string) => `/essay/${essay}`;
 
 /**
  * 获取文件url

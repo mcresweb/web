@@ -5,12 +5,12 @@ import BBCoder, { type BBCoderVistor } from 'bbcoder';
  * @param string bbcode
  * @returns html
  */
-export const bbcode = (string: string) => {
+export const bbcode = (string: string): string => {
 	const bbcode = new BBCoder(string);
 	try {
 		bbcode.parse();
 	} catch (err) {
-		return err;
+		return `${err}`;
 	}
 	return bbcode.html(vistor);
 };
