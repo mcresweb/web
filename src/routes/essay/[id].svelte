@@ -36,7 +36,7 @@
 	import 'swiper/css/autoplay';
 	import { imgUrl } from '$lib/api/img';
 	import { marked } from 'marked';
-	import { getInfo } from '$lib/api/user';
+	import { getInfo, getMe } from '$lib/api/user';
 	import { browser, dev } from '$app/env';
 	import { page, session } from '$app/stores';
 	import Icon from '$components/Icon.svelte';
@@ -63,9 +63,20 @@
 
 <div class="container-xl">
 	<article id="head">
-		<span class="edit-btn" on:click={() => goto(`./edit/${essay.id}`)}>
-			<Icon icon="24px" size={1.3} />
-		</span>
+		{#if browser}
+			{#await getMe(fetch) then info}
+				{#if info.login && info.admin}
+					<span
+						data-tooltip="点击编辑此essay"
+						class="edit-btn"
+						on:click={() => goto(`./edit/${essay.id}`)}
+					>
+						<!-- TODO iconfont损坏 -->
+						<Icon icon="24px" size={1.3} />
+					</span>
+				{/if}
+			{/await}
+		{/if}
 		<nav>
 			<ul>
 				<li>
