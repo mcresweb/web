@@ -39,7 +39,9 @@
 	<div class="container">
 		<article>
 			<div class="headings">
-				<h1>搜索:&nbsp;{$page.url.searchParams.get('t')}</h1>
+				<h1>
+					搜索:&nbsp;<span style:color="var(--bs-red)">{$page.url.searchParams.get('t')}</span>
+				</h1>
 				<h2>共找到&nbsp;{data.hits}{data.hasMore ? '+' : ''}&nbsp;个相关内容</h2>
 			</div>
 			{#if cooling > 0}

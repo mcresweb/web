@@ -176,6 +176,44 @@ export const uploadEssay = async (
 	if (!resp.ok) return { success: false, err: `${resp.status} ${resp.statusText}` };
 	return await resp.json();
 };
+/**
+ * 上传内容
+ * @param f fetch
+ * @param id 内容ID
+ * @param data 内容数据
+ * @returns 上传结果
+ */
+export const editEssay = async (
+	f: FetchFunction,
+	id: number,
+	data: EssayUpload,
+): Promise<UploadResp<number>> => {
+	if (isNaN(id)) return { success: false, err: 'NaN id: ' + id };
+	const resp = await f(`${API_URL}/api/content/essay-edit?id=${id}`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(data),
+	});
+	if (!resp.ok) return { success: false, err: `${resp.status} ${resp.statusText}` };
+	return await resp.json();
+};
+
+/**
+ * 获取essay编辑数据
+ * @param f fetch
+ * @param id 内容ID
+ */
+export const getEssayEditData = async (
+	f: FetchFunction,
+	id: number,
+): Promise<
+	(EssayUpload & { bad?: undefined }) | { bad: true; err: string; status: number } | null
+> => {
+	if (isNaN(id)) return null;
+	const resp = await f(`${API_URL}/api/content/essay-edit?id=${id}`);
+	if (!resp.ok) return { bad: true, err: await resp.text(), status: resp.status };
+	return resp.json();
+};
 
 /**
  * 列出内容的文件列表
@@ -213,6 +251,23 @@ export const uploadFile = async (
 	});
 	if (!resp.ok) return { success: false, err: `${resp.status} - ${await resp.text()}` };
 	return await resp.json();
+};
+
+/**
+ * 移除文件
+ * @param f fetch
+ * @param essay 内容ID
+ * @param file 文件UUID
+ * @returns 移除结果
+ */
+export const removeFile = async (
+	f: FetchFunction,
+	essay: number,
+	file: string,
+): Promise<ModResp> => {
+	const resp = await f(`${API_URL}/api/content/remove-file?essay=${essay}&file=${file}`);
+	if (!resp.ok) return { success: false, err: `${resp.status} - ${await resp.text()}` };
+	return resp.json();
 };
 
 /**

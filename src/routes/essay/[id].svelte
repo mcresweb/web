@@ -1,7 +1,6 @@
 <script context="module" lang="ts">
 	import {
 		contentUrl,
-		fileUrl,
 		getCatalogueByKey,
 		getCategoryByKey,
 		getEssay,
@@ -41,9 +40,10 @@
 	import { browser, dev } from '$app/env';
 	import { page, session } from '$app/stores';
 	import Icon from '$components/Icon.svelte';
-	import Dialog from '$components/Dialog.svelte';
 	import { bbcode } from '$helpers/bbcode';
 	import { delay } from '$helpers/delay';
+	import { goto } from '$app/navigation';
+	import FileTable from '$components/FileTable.svelte';
 
 	export let essay: Essay;
 	if (browser && $page.params.id == random) history.replaceState(null, '', './' + essay.id);
@@ -57,25 +57,21 @@
 	};
 	/** 资源promise */
 	let resPromise: Promise<FileList | string>;
-
-	/** 资源的内部状态 */
-	let stat: Record<string, { sha1: boolean }> = {};
-	const setInfo = (info: FileList): 1 => {
-		info.files.forEach((f) => (stat[f.id] = { sha1: false }));
-		return 1;
-	};
 </script>
 
 <svelte:head><title>{essay.title} - {$session.title}</title></svelte:head>
 
 <div class="container-xl">
 	<article id="head">
+		<span class="edit-btn" on:click={() => goto(`./edit/${essay.id}`)}>
+			<Icon icon="24px" size={1.3} />
+		</span>
 		<nav>
 			<ul>
 				<li>
 					<div class="headings">
-						<h1 class="hidden-sm">{essay.title}</h1>
-						<h3 class="visible-sm">{essay.title}</h3>
+						<h1 class="title hidden-sm">{essay.title}</h1>
+						<h3 class="title visible-sm">{essay.title}</h3>
 						<h2>
 							{#await delay()}
 								{essay.catalogue} &gt; {essay.category}
@@ -176,59 +172,7 @@
 			{#await (resPromise = resPromise || listFile(fetch, essay.id))}
 				<span aria-busy="true" />
 			{:then info}
-				{#if !info || typeof info === 'string'}
-					无法获取资源: <span>{info}</span>
-				{:else if setInfo(info)}
-					<table role="grid" id="res_list">
-						<thead>
-							<tr>
-								<th>文件名</th>
-								<th>大小</th>
-								<th>校验</th>
-								<th>下载</th>
-							</tr>
-						</thead>
-						<tbody>
-							{#each info.files as file}
-								<tr>
-									<td class="txt">{file.name}</td>
-									<td class="txt">{file.size}</td>
-									<td
-										class="icon"
-										on:click={() => {
-											stat[file.id] = { ...stat[file.id], sha1: true };
-										}}
-									>
-										<span data-tooltip="点击显示文件的SHA1值">
-											<Icon icon="xiaoyan" size={1.8} />
-										</span>
-									</td>
-									<td class="icon">
-										<a href={fileUrl(essay.id, file.id)} target="_blank">
-											<span data-tooltip="点击下载此文件">
-												<Icon icon="24px" size={1.8} />
-											</span>
-										</a>
-									</td>
-								</tr>
-								<Dialog bind:open={stat[file.id].sha1}>
-									<h1>文件校验</h1>
-									<table>
-										<tr><td>内容ID</td><td>{essay.id}</td></tr>
-										<tr><td>文件ID</td><td>{file.id}</td></tr>
-										<tr><td>文件名称</td><td>{file.name}</td></tr>
-										<tr><td>文件SHA1</td><td>{file.sha1}</td></tr>
-									</table>
-								</Dialog>
-							{/each}
-						</tbody>
-						<tfoot>
-							<tr>
-								<td>共计 {info.files.length} 个文件</td>
-							</tr>
-						</tfoot>
-					</table>
-				{/if}
+				<FileTable id={essay.id} files={info} />
 			{/await}
 		</article>
 	{/if}
@@ -278,6 +222,16 @@
 	#head h2 * {
 		color: var(--bs-gray) !important;
 	}
+	#head .title {
+		max-width: 90%;
+		white-space: normal;
+	}
+	#head .edit-btn {
+		cursor: pointer;
+		position: absolute;
+		right: 20px;
+		top: 20px;
+	}
 	article {
 		position: relative;
 	}
@@ -286,9 +240,6 @@
 	}
 	.visible-sm {
 		display: none;
-	}
-	#res_list .icon {
-		width: 10%;
 	}
 	@media (max-width: 768px) {
 		.visible-sm {

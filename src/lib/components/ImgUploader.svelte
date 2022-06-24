@@ -15,13 +15,17 @@
 	import { cubicIn } from 'svelte/easing';
 	import { blur } from 'svelte/transition';
 
+	export let existFiles: Record<string, ImgUsing> = {};
+	/** 使用的文字, 用于检测图片是否被使用 */
+	export let txt: string;
+
 	/** 图片文件列表 */
 	let filesIn: FileList | null = null;
 
 	/**文件数据*/
 	type FileData = {
 		/**文件*/
-		file: File;
+		file?: File;
 		/**使用的类型*/
 		type: ImgUsing;
 		/**错误*/
@@ -29,14 +33,28 @@
 		/**本地编号, 用于文本替代*/
 		localID: string;
 		/**本地图片地址, 用于本地预览*/
-		localUrl: string;
+		localUrl?: string;
 		/**元素对象*/
 		element?: HTMLImageElement;
 		uploaded?: true;
 		/**远程uuid(图片真实uuid, 仅在上传后有效)*/
 		remoteUUID?: string;
 	};
-	let filedata: FileData[] = [];
+	/**所有图片数据（包括已存在和待上传）*/
+	let filedata: FileData[] = ((exists) => {
+		//已存在的图片数据处理(仅处理一次)
+		const uuids = Object.keys(exists);
+		const rand = ((Math.random() * 36) | 0).toString(36);
+		const time = Date.now() * Math.pow(36, uuids.length.toString(36).length);
+
+		return uuids.map((x, i) => ({
+			type: exists[x],
+			localID: `EIMG-${rand}${(time + i).toString(36).toUpperCase()};`,
+			remoteUUID: x,
+			uploaded: true,
+		}));
+	})(existFiles);
+
 	const resetImgType = (files: FileList) => {
 		const rand = ((Math.random() * 36) | 0).toString(36);
 		const time = Date.now() * Math.pow(36, files.length.toString(36).length);
@@ -50,7 +68,7 @@
 				localUrl: URL.createObjectURL(files[i]),
 			});
 		}
-		filedata[0].err = '测试';
+		filedata = filedata;
 	};
 	$: if (filesIn) resetImgType(filesIn);
 
@@ -77,14 +95,14 @@
 			const submitStat: Record<string, SubmitStat> = {};
 			statCb && statCb(submitStat);
 			const data = filedata
-				.filter((data) => !data.uploaded)
+				.filter((data) => !data.uploaded && data.file)
 				.filter(
 					(data) =>
 						(txt || '').indexOf(data.localID) >= 0 || Object.values(data.type).some((x) => x),
 				);
 			if (!(data.length > 0)) return resolve(true);
 			const tasks: task[] = data.map((data, i) => {
-				const file = data.file;
+				const file = data.file!;
 				const key = file.name + ' ' + i + ' ' + Date.now();
 				return () =>
 					new Promise<void>((r) => {
@@ -140,7 +158,7 @@
 			(data) =>
 				(text = text.replace(
 					new RegExp(data.localID, 'g'),
-					data.remoteUUID ? imgUrl(data.remoteUUID) : data.localUrl,
+					data.remoteUUID ? imgUrl(data.remoteUUID) : data.localUrl!,
 				)),
 		);
 		return text;
@@ -151,15 +169,15 @@
 	 * @param data 数据
 	 */
 	const revoke = (data: FileData[]) =>
-		data.map((d) => d.localUrl).forEach((url) => URL.revokeObjectURL(url));
+		data
+			.map((d) => d.localUrl)
+			.filter((x) => x)
+			.forEach((url) => URL.revokeObjectURL(url!));
 	onDestroy(() => {
 		const data = [...filedata];
 		filedata = [];
 		revoke(data);
 	});
-
-	/** 使用的文字, 用于检测图片是否被使用 */
-	export let txt: string;
 </script>
 
 <label>
@@ -174,7 +192,8 @@
 				<fieldset>
 					<span
 						class="close"
-						class:disabled={(txt || '').indexOf(data.localID) >= 0}
+						class:disabled={(txt || '').indexOf(data.localID) >= 0 ||
+							(data.remoteUUID && (txt || '').indexOf(data.remoteUUID) >= 0)}
 						on:click={() => {
 							const data = [...filedata];
 							revoke(data.splice(i, 1));
@@ -197,7 +216,11 @@
 					</span>
 				</fieldset>
 				<div class="img" on:dragstart={(e) => dragstart(e, data.localID)} draggable>
-					<img bind:this={data.element} src={data.localUrl} alt={data.file.name} />
+					<img
+						bind:this={data.element}
+						src={data.localUrl || imgUrl(data.remoteUUID || '' /*必然存在*/)}
+						alt={data?.file?.name || data.remoteUUID}
+					/>
 				</div>
 				{#if data.err}
 					<input readonly class="error" value={data.err} aria-invalid={true} />
@@ -280,7 +303,7 @@
 	}
 	.close.disabled {
 		cursor: default;
-		opacity: 0.3;
+		opacity: 0.2;
 	}
 	.close:hover:not(.disabled) {
 		opacity: 1;
