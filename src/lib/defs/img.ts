@@ -10,9 +10,9 @@ export class ImgUsing {
 /**
  * 图片使用类型描述
  */
-export const imgUsingDescribe: Record<keyof ImgUsing, string> = {
-	head: '导航展示',
-	list: '列表展示',
+export const imgUsingDescribe: Record<keyof ImgUsing, { txt: string; tip: string }> = {
+	head: { txt: '导航展示', tip: '展示在内容详细页的头部' },
+	list: { txt: '列表展示', tip: '作为内容列表的封面图片' },
 };
 /**
  * 图片使用类型的键

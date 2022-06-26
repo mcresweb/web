@@ -77,12 +77,12 @@
 				{/if}
 			{/await}
 		{/if}
-		<nav>
+		<nav class="title-nav">
 			<ul>
 				<li>
 					<div class="headings">
-						<h1 class="title hidden-sm">{essay.title}</h1>
-						<h3 class="title visible-sm">{essay.title}</h3>
+						<h1 class="hidden-sm title">{essay.title}</h1>
+						<h3 class="visible-sm title">{essay.title}</h3>
 						<h2>
 							{#await delay()}
 								{essay.catalogue} &gt; {essay.category}
@@ -107,10 +107,14 @@
 					</div>
 				</li>
 			</ul>
-			<ul>
+			<ul class="hidden-sm res-field">
 				<li><button class="res-btn" on:click={openRes}>获取资源</button></li>
 			</ul>
 		</nav>
+		<div class="sm-res-box visible-sm">
+			<button class="res-btn">&nbsp;</button>
+			<button class="res-btn" on:click={openRes}>获取资源</button>
+		</div>
 		<nav>
 			<ul>
 				<li>评价:</li>
@@ -233,8 +237,18 @@
 	#head h2 * {
 		color: var(--bs-gray) !important;
 	}
-	#head .title {
-		max-width: 90%;
+	#head .title-nav li {
+		padding-bottom: 0;
+	}
+	#head .title-nav ul:first-child {
+		width: 90%;
+		overflow-x: hidden;
+	}
+	#head .title-nav ul:first-child > li,
+	#head .title-nav ul:first-child > li > div {
+		width: 100%;
+	}
+	#head .title-nav .title {
 		white-space: normal;
 	}
 	#head .edit-btn {
@@ -246,6 +260,27 @@
 	article {
 		position: relative;
 	}
+	.sm-res-box {
+		display: block;
+		position: relative;
+		width: 100%;
+	}
+	.sm-res-box > button:first-child {
+		display: inline-block;
+		width: 0;
+		margin-left: 0;
+		margin-right: 0;
+		padding-left: 0;
+		padding-right: 0;
+		border: none;
+		opacity: 0;
+		cursor: normal;
+	}
+	.sm-res-box > button:last-child {
+		display: inline-block;
+		position: absolute;
+		right: 0;
+	}
 	.res-btn {
 		width: unset;
 	}
@@ -255,6 +290,13 @@
 	@media (max-width: 768px) {
 		.visible-sm {
 			display: unset;
+		}
+		.sm-res-box {
+			display: block;
+		}
+
+		#head .title-nav ul:first-child {
+			width: 100%;
 		}
 		.hidden-sm {
 			display: none;

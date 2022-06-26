@@ -201,6 +201,7 @@
 						}}
 					/>
 					{#each imgUsingKeys as type}
+						{@const describe = imgUsingDescribe[type]}
 						<label for="img_{i}_{type}_switch">
 							<input
 								type="checkbox"
@@ -208,7 +209,7 @@
 								role="switch"
 								bind:checked={data.type[type]}
 							/>
-							{imgUsingDescribe[type]}
+							<span data-tooltip={describe.tip}>{describe.txt}</span>
 						</label>
 					{/each}
 					<span data-tooltip="在编辑文本时用此ID替代图片的地址">
