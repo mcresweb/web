@@ -3,6 +3,7 @@ import type {
 	Category,
 	Essay,
 	EssayList,
+	EssayRecommendList,
 	EssayUpload,
 	FileList,
 	ModCatalogueRequest,
@@ -100,6 +101,68 @@ export const listEssay = async (
 	data.list = data.list.sort(sortId);
 	return data;
 };
+/**
+ * 推荐内容
+ * @param f fetch
+ * @param id 相关内容ID
+ * @returns
+ */
+export const recommendEssay = async (
+	f: FetchFunction,
+	id?: number,
+): Promise<EssayList['list'] | null> => {
+	let url = `${API_URL}/api/content/recommend/get`;
+	if (typeof id === 'number') url += `?id=${id}`;
+	const resp = await f(url);
+	if (!resp.ok) return null;
+	const data: EssayList = await resp.json();
+	data.list = data.list.sort(sortId);
+	return data.list;
+};
+
+/**
+ * 获取推荐内容信息
+ * @param f fetch
+ * @param id 内容ID
+ * @returns 推荐信息
+ */
+export const recommendEssayInfo = async (
+	f: FetchFunction,
+	id: number,
+): Promise<EssayRecommendList['list'][number] | null> => {
+	const resp = await f(`${API_URL}/api/content/recommend/info?id=${id}`);
+	if (!resp.ok) return null;
+	return await resp.json();
+};
+/**
+ * 添加/修改内容推荐
+ * @param f fetch
+ * @param id 内容ID
+ * @param expire 推荐过期时间戳
+ */
+export const addEssayRecommend = async (
+	f: FetchFunction,
+	id: number,
+	expire?: number,
+): Promise<void> => {
+	let url = `${API_URL}/api/content/recommend/add?id=${id}`;
+	if (typeof expire === 'number' && expire > Date.now()) url += `&expire=${expire}`;
+	await f(url);
+};
+/**
+ * 列出推荐配置
+ * @param f fetch
+ * @param page 页码(从0开始)
+ */
+export const listRecommendEssay = async (
+	f: FetchFunction,
+	page: number,
+): Promise<EssayRecommendList> => {
+	const resp = await f(`${API_URL}/api/content/recommend/list?page=${page}`);
+	if (!resp.ok) throw `${resp.status} - ${await resp.text()}`;
+	return await resp.json();
+};
+
 /**
  * 获取一个内容
  * @param f fetch
@@ -288,6 +351,12 @@ export const contentUrl = (catalogue: string, category?: string, page?: number) 
  * @returns url
  */
 export const essayUrl = (essay: number | string) => `/essay/${essay}`;
+/**
+ * 获取内容推荐编辑url
+ * @param essay 内容ID
+ * @returns url
+ */
+export const essayRecommendUrl = (essay: number | string) => `/essay/recommend/${essay}`;
 
 /**
  * 获取文件url

@@ -50,6 +50,49 @@ export type EssayList = {
 };
 
 /**
+ * 内容推荐列表
+ */
+export type EssayRecommendList = {
+	/** 页数 */
+	page: number;
+	/** 内容列表 */
+	list: {
+		/** 内容ID (唯一, 影响排序, 降序) */
+		id: number;
+		/** 发布者用户名 */
+		sender: string;
+		/** 内容标题 */
+		title: string;
+		/** 评分 */
+		star?: number;
+		/** 下载数 */
+		download: number;
+		/** 内容图片 */
+		img: string;
+		/** 过期时间 */
+		expire: number;
+		/** 提升时间 */
+		hoist: number;
+		/** 推荐者用户名 */
+		recommender: string;
+	}[];
+};
+
+export const EssayRecommendInfo: {
+	[k in keyof EssayRecommendList['list'][number]]?: {
+		name: string;
+		t?: (x: any) => string;
+	};
+} = {
+	expire: { name: '推荐过期时间', t: (x) => new Date(x).toLocaleString() },
+	hoist: { name: '推荐提升时间', t: (x) => new Date(x).toLocaleString() },
+	recommender: { name: '推荐者' },
+};
+export const EssayRecommendInfoKey: (keyof typeof EssayRecommendInfo)[] = Object.keys(
+	EssayRecommendInfo,
+) as any;
+
+/**
  * 一个内容的完整数据
  */
 export type Essay = {
