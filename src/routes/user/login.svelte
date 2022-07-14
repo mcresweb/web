@@ -190,7 +190,10 @@
 		const ele = inputElements[type];
 		if (!ele) return;
 		const limit = inputLimit[type];
-		if (!limit || (limit.empty ? limit.empty : (str: string) => !str)(input)) {
+		if (!limit){
+			ele.removeAttribute(attr);
+			inputErrors[type] = undefined;
+        }else if ((limit.empty ? limit.empty : (str: string) => !str)(input)) {
 			ele.removeAttribute(attr);
 			inputErrors[type] = null;
 		} else {
