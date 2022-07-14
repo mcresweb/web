@@ -5,6 +5,7 @@
 		doRegister,
 		getMe,
 		getSalt,
+		sendEmailCheckCode,
 		summonInitCode,
 	} from '$lib/api/user';
 	import { register as getRegisterInfo } from '$lib/api/info';
@@ -36,6 +37,7 @@
 	import type { RegisterInfo } from '$defs/info';
 	import Dialog from '$components/Dialog.svelte';
 	import InputBase from '$components/InputBase.svelte';
+	import { onMount } from 'svelte';
 
 	export let regInfo: RegisterInfo;
 
@@ -141,8 +143,8 @@
 		account: {
 			limit: [
 				{ txt: '名称过长', func: (str) => str.length > regInfo.nameLen },
-				{ txt: '不得含@符号', func: (str) => str.indexOf('@') >= 0 },
-				{ txt: '不得为纯数字', func: (str) => /^[0-9]+$/.test(str) },
+				{ txt: '不得含@符号', func: (str) => type === types[1] && str.indexOf('@') >= 0 },
+				{ txt: '不得为纯数字', func: (str) => type === types[1] && /^[0-9]+$/.test(str) },
 			],
 		},
 		email: {
@@ -196,6 +198,25 @@
 			ele.setAttribute(attr, !!bad + '');
 			inputErrors[type] = bad?.txt;
 		}
+	};
+
+	/**
+	 * 邮箱验证码冷却
+	 * 字符串: 错误消息, 正数: 冷却秒数, 0: 无, -1: 发送中
+	 */
+	let emailCodeCooling: number | string = 0;
+	onMount(() => {
+		const task = setInterval(() => {
+			if (typeof emailCodeCooling === 'number' && emailCodeCooling > 0) emailCodeCooling--;
+		}, 1000);
+		return () => clearInterval(task);
+	});
+	const getEmailCode = async () => {
+		emailCodeCooling = -1;
+		const resp = await sendEmailCheckCode(fetch, email);
+		if (typeof resp === 'string') emailCodeCooling = resp;
+		else if (resp) emailCodeCooling = 60;
+		else emailCodeCooling = '内部错误';
 	};
 </script>
 
@@ -266,16 +287,20 @@
 							placeholder="请输入您的验证码"
 							bind:value={emailCode}
 							bind:inputElement={inputElements.emailCode}
-							error={inputErrors.emailCode}
+							error={typeof emailCodeCooling === 'string'
+								? emailCodeCooling
+								: inputErrors.emailCode}
 						/>
 						<label for="getEmailCode" class="col-5">
 							获取验证码
 							<button
 								id="getEmailCode"
-								disabled={inputErrors.email !== undefined}
-								on:click={() => alert('?')}
+								aria-busy={emailCodeCooling == -1 ? true : undefined}
+								disabled={inputErrors.email !== undefined ||
+									(typeof emailCodeCooling === 'number' && emailCodeCooling !== 0)}
+								on:click={getEmailCode}
 							>
-								获取
+								获取{#if typeof emailCodeCooling === 'number' && emailCodeCooling > 0}&nbsp;({emailCodeCooling}){/if}
 							</button>
 						</label>
 					</div>

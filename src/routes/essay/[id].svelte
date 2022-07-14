@@ -29,13 +29,7 @@
 
 <script lang="ts">
 	import Star from '$components/Star.svelte';
-	import {
-		EssayRecommendInfo,
-		EssayRecommendInfoKey,
-		type Essay,
-		type EssayList,
-		type FileList,
-	} from '$defs/content';
+	import type { Essay, EssayList, FileList } from '$defs/content';
 	import { Autoplay, Pagination, Mousewheel } from 'swiper';
 	import { Swiper, SwiperSlide } from 'swiper/svelte';
 	import 'swiper/css';
@@ -51,8 +45,6 @@
 	import { delay } from '$helpers/delay';
 	import FileTable from '$components/FileTable.svelte';
 	import EssayLine from './_EssayLine.svelte';
-	import Dialog from '$components/Dialog.svelte';
-	import { recommendEssayInfo } from '$lib/api/content';
 	import EssayRecommendDialog from './_EssayRecommendDialog.svelte';
 
 	export let essay: Essay;

@@ -90,6 +90,20 @@ export const doRegister = async (
 	if (resp.ok) return resp.json();
 	return { success: false, err: `${resp.status} - ${await resp.text()}` };
 };
+/**
+ * 发送邮箱验证码
+ * @param f fetch
+ * @param email 邮箱
+ * @returns 成功(true)/失败(false)/失败消息(string)
+ */
+export const sendEmailCheckCode = async (
+	f: FetchFunction,
+	email: string,
+): Promise<boolean | string> => {
+	const resp = await f(`${API_URL}/api/user/check-email?email=${encodeURIComponent(email)}`);
+	if (!resp.ok) return `${resp.status} - ${await resp.text()}`;
+	return !!resp.json();
+};
 
 /**
  * 登录地址
