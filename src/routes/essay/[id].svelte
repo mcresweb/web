@@ -51,7 +51,7 @@
 	if (browser && $page.params.id == random) history.replaceState(null, '', './' + essay.id);
 
 	/** 是否显示资源 */
-	let showRes: boolean = browser && $page.url.hash === '#res';
+	let showRes: boolean = browser && essay?.files > 0 && $page.url.hash === '#res';
 	/** 显示资源 */
 	const openRes = () => {
 		showRes = true;
@@ -124,13 +124,17 @@
 						</div>
 					</li>
 				</ul>
-				<ul class="hidden-sm res-field">
-					<li><button class="res-btn" on:click={openRes}>获取资源</button></li>
+				<ul class="hidden-sm res-field" style:visibility={essay?.files > 0 ? 'visible' : 'hidden'}>
+					<li>
+						<button disabled={!(essay?.files > 0)} class="res-btn" on:click={openRes}>
+							获取资源
+						</button>
+					</li>
 				</ul>
 			</nav>
-			<div class="sm-res-box visible-sm">
+			<div class="sm-res-box visible-sm" style:visibility={essay?.files > 0 ? 'visible' : 'hidden'}>
 				<button class="res-btn">&nbsp;</button>
-				<button class="res-btn" on:click={openRes}>获取资源</button>
+				<button disabled={!(essay?.files > 0)} class="res-btn" on:click={openRes}>获取资源</button>
 			</div>
 			<nav>
 				<ul>

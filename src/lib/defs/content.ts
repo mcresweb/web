@@ -122,6 +122,8 @@ export type Essay = {
 	tags?: string[];
 	/** 简略描述 */
 	description?: string;
+	/** 资源文件数量 */
+	files: number;
 };
 /**
  * 一个新建内容的数据
