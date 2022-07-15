@@ -35,7 +35,7 @@
 	{:then essay}
 		{#if !essay}
 			<h1 style:color="var(--bs-red)">啊哦, 页面出错了!</h1>
-		{:else}
+		{:else if essay?.list?.length > 0}
 			<PageNumber {nowPage} allPage={essay.page} onChange={goPage} />
 			<div class="row" in:fly={flyData}>
 				{#each essay.list as ess (ess.id)}
@@ -62,6 +62,10 @@
 				{/each}
 			</div>
 			<PageNumber {nowPage} allPage={essay.page} onChange={goPage} />
+		{:else if essay.page > 0}
+			<h1 style:color="var(--bs-red)">啊哦, 您输入了一个错误的页码!</h1>
+		{:else}
+			<h1 style:color="var(--bs-red)">啊哦, 这个分类下还没有内容呢!</h1>
 		{/if}
 	{/await}
 </main>
