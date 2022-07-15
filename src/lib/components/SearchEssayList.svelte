@@ -6,7 +6,7 @@
 	export let docs: SearchDoc[] | null;
 
 	const flagStr = '<b>';
-	const hf = (str: string) => str.indexOf(flagStr) >= 0;
+	const hf = (str: string): boolean => !!str && str.indexOf(flagStr) >= 0;
 </script>
 
 {#if docs}
