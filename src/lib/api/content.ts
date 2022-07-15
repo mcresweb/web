@@ -23,7 +23,7 @@ import { cacheOrGet } from '$helpers/browserCache';
 export const listCatalogue = async (f: FetchFunction): Promise<Catalogue[]> => {
 	const data = await cacheOrGet('listCatalogue', null, async () => {
 		const resp = await f(`${API_URL}/api/content/list-catalogue`);
-		if (!resp.ok) throw new Error();
+		if (!resp.ok) throw new Error('Can not list Catalogue');
 		return await resp.json();
 	});
 	return data.sort(sortIndex);
