@@ -11,7 +11,7 @@ import type {
 	ModResp,
 	UploadResp,
 } from '$defs/content';
-import { API_URL, type FetchFunction } from '$defs/FetchFunction.type';
+import { API_URL, checkResp, type FetchFunction } from '$defs/FetchFunction.type';
 import { cacheOrGet } from '$helpers/browserCache';
 
 /**
@@ -23,7 +23,7 @@ import { cacheOrGet } from '$helpers/browserCache';
 export const listCatalogue = async (f: FetchFunction): Promise<Catalogue[]> => {
 	const data = await cacheOrGet('listCatalogue', null, async () => {
 		const resp = await f(`${API_URL}/api/content/list-catalogue`);
-		if (!resp.ok) throw new Error('Can not list Catalogue');
+		await checkResp(resp, 'Can not list Catalogue');
 		return await resp.json();
 	});
 	return data.sort(sortIndex);
@@ -147,7 +147,8 @@ export const addEssayRecommend = async (
 ): Promise<void> => {
 	let url = `${API_URL}/api/content/recommend/add?id=${id}`;
 	if (typeof expire === 'number' && expire > Date.now()) url += `&expire=${expire}`;
-	await f(url);
+	const resp = await f(url);
+	await checkResp(resp);
 };
 /**
  * 列出推荐配置
@@ -159,7 +160,7 @@ export const listRecommendEssay = async (
 	page: number,
 ): Promise<EssayRecommendList> => {
 	const resp = await f(`${API_URL}/api/content/recommend/list?page=${page}`);
-	if (!resp.ok) throw `${resp.status} - ${await resp.text()}`;
+	await checkResp(resp);
 	return await resp.json();
 };
 
@@ -202,6 +203,7 @@ export const modCatalogue = async (
 		},
 		body: JSON.stringify(data),
 	});
+	await checkResp(resp);
 	return await resp.json();
 };
 
@@ -219,6 +221,7 @@ export const modCategory = async (f: FetchFunction, data: ModCategoryRequest): P
 		},
 		body: JSON.stringify(data),
 	});
+	await checkResp(resp);
 	return await resp.json();
 };
 /**

@@ -1,4 +1,4 @@
-import { API_URL, type FetchFunction } from '$defs/FetchFunction.type';
+import { API_URL, checkResp, type FetchFunction } from '$defs/FetchFunction.type';
 import type { SearchReq, SearchResp, SummonReq, UseReq, UseResp } from '$defs/keyword';
 import { cacheOrGet } from '$helpers/browserCache';
 
@@ -25,7 +25,11 @@ export const useToken = async (f: FetchFunction, token: string): Promise<UseResp
  * @returns 会员码长度
  */
 export const tokenLen = async (f: FetchFunction): Promise<number> => {
-	return cacheOrGet('tokenLen', null, () => f('/api/keyword/token-len').then((r) => r.json()));
+	return cacheOrGet('tokenLen', null, async () => {
+		const resp = await f('/api/keyword/token-len');
+		await checkResp(resp);
+		return await resp.json();
+	});
 };
 
 /**
@@ -39,6 +43,7 @@ export const summonToken = async (f: FetchFunction, data: SummonReq): Promise<st
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify(data),
 	});
+	await checkResp(resp);
 	return await resp.json();
 };
 
@@ -54,5 +59,6 @@ export const searchToken = async (f: FetchFunction, data: SearchReq): Promise<Se
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify(data),
 	});
+	await checkResp(resp);
 	return await resp.json();
 };

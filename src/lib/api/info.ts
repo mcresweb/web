@@ -1,4 +1,4 @@
-import { API_URL, type FetchFunction } from '$defs/FetchFunction.type';
+import { API_URL, checkResp, type FetchFunction } from '$defs/FetchFunction.type';
 import type { BasicInfo, RegisterInfo } from '$defs/info';
 
 /**
@@ -8,7 +8,7 @@ import type { BasicInfo, RegisterInfo } from '$defs/info';
  */
 export const basic = async (f: FetchFunction): Promise<BasicInfo> => {
 	const resp = await f(API_URL + '/api/info/basic');
-	if (!resp.ok) throw new Error();
+	await checkResp(resp);
 	return await resp.json();
 };
 
@@ -19,6 +19,6 @@ export const basic = async (f: FetchFunction): Promise<BasicInfo> => {
  */
 export const register = async (f: FetchFunction): Promise<RegisterInfo> => {
 	const resp = await f(API_URL + '/api/info/register');
-	if (!resp.ok) throw new Error();
+	await checkResp(resp);
 	return await resp.json();
 };
